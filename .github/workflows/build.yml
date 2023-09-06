@@ -1,0 +1,134 @@
+name: Build NVTOP Application
+
+on:
+  workflow_dispatch:
+    inputs:
+      nightly-build:
+        description: 'Nightly build'
+        type: boolean
+        required: true
+        default: false
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build:
+    name: Build App
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, ubuntu-22.04, ubuntu-20.04]
+        include:
+          - os: ubuntu-24.04
+            codename: "noble"
+          - os: ubuntu-22.04
+            codename: "jammy"
+    runs-on: ${{ matrix.os }}
+    if: ${{ github.event.inputs.nightly-build == 'false' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install libraries
+        run: |
+          sudo apt-get install libncurses5-dev libncursesw5-dev libdrm-dev libsystemd-dev libudev-dev
+          sudo apt-get install libfuse2
+
+      - name: Install build tools
+        run: |
+          sudo apt-get install -y dh-make devscripts build-essential lintian
+
+      - name: Build and make release
+        run: |
+          bash ${{ github.workspace }}/release.sh
+
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nvtop-${{ matrix.codename }}
+          path: |
+            ${{ github.workspace }}/release/nvtop_*.deb
+            ${{ github.workspace }}/release/nvtop-*.AppImage
+
+      - name: Publish PPA package
+        uses: yuezk/publish-ppa-package@main
+        if: matrix.codename == 'noble'
+        with:
+          tarball: ${{ github.workspace }}/release/nvtop-*.tar.gz
+          debian_dir: ${{ github.workspace }}/debian/
+          repository: "quentiumyt/nvtop"
+          deb_email: "pro@quentium.fr"
+          deb_fullname: "Quentin Lienhardt"
+          gpg_private_key: ${{ secrets.PPA_GPG_PRIVATE_KEY }}
+          gpg_passphrase: ${{ secrets.PPA_GPG_PASSPHRASE }}
+          series: "noble jammy"
+          new_version_template: "{VERSION}-{REVISION}+{SERIES}"
+
+  nightly-build:
+    name: Build Nightly App
+    runs-on: ubuntu-24.04
+    if: ${{ github.event.inputs.nightly-build == 'true' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Install libraries
+        run: |
+          sudo apt-get install libncurses5-dev libncursesw5-dev libdrm-dev libsystemd-dev libudev-dev
+          sudo apt-get install libfuse2
+
+      - name: Install build tools
+        run: |
+          sudo apt-get install -y dh-make devscripts build-essential lintian
+
+      - name: Build and make nightly release
+        run: |
+          bash ${{ github.workspace }}/release.sh nightly
+
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nvtop-nightly
+          path: |
+            ${{ github.workspace }}/release/nvtop-nightly_*.deb
+            ${{ github.workspace }}/release/nvtop-nightly-*.AppImage
+
+      - name: Get commit count
+        id: commit_count
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 || echo "HEAD")
+          COMMITS=$(git rev-list --count $LAST_TAG..HEAD)
+          echo "commit_count=$COMMITS" >> $GITHUB_ENV
+
+      - name: Update debian files
+        run: |
+          sed -i "s/-1)/+${{ env.commit_count }}-1)/g" ${{ github.workspace }}/debian/changelog
+          sed -i "s/^nvtop/nvtop-nightly/g" ${{ github.workspace }}/debian/changelog
+          sed -i "s/ nvtop$/ nvtop-nightly/g" ${{ github.workspace }}/debian/control
+
+      - name: Display debian folder
+        run: |
+          echo "Debian folder content:"
+          ls -la ${{ github.workspace }}/debian/
+          echo "Release folder content:"
+          ls -la ${{ github.workspace }}/release/
+          echo "Control file content:"
+          cat ${{ github.workspace }}/debian/control
+          echo "Changelog file content:"
+          cat ${{ github.workspace }}/debian/changelog
+
+      - name: Publish PPA package
+        uses: yuezk/publish-ppa-package@main
+        with:
+          tarball: ${{ github.workspace }}/release/nvtop-nightly-*.tar.gz
+          debian_dir: ${{ github.workspace }}/debian/
+          repository: "quentiumyt/nvtop"
+          deb_email: "pro@quentium.fr"
+          deb_fullname: "Quentin Lienhardt"
+          gpg_private_key: ${{ secrets.PPA_GPG_PRIVATE_KEY }}
+          gpg_passphrase: ${{ secrets.PPA_GPG_PASSPHRASE }}
+          series: "noble jammy"
+          new_version_template: "{VERSION}-{REVISION}+{SERIES}"

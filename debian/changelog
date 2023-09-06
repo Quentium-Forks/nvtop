@@ -1,0 +1,28 @@
+nvtop (3.2.0-1) focal; urgency=medium
+
+  * Intel XE driver support thanks to @Steve-Tech
+  * Supports more metrics when CAP_PERFMON is given to nvtop. See the Intel section of the README
+  * Broadcom V3D support (Raspberry Pi) thanks to @xiaohuirong
+  * Google TPU support thanks to @rdyro
+  * Interface hide process list with the -P option thanks to @ring-c
+  * On recent GPUs, the encode and decode engines are most likely shared, nvtop will now display "ENC/DEC" in the known cases.
+  * Nvtop can be installed from conda forge thanks to @matthewfeickert
+  * JSON snapshot option -s thanks to @jwilkins88
+
+  * Improved Intel i915 support by @Steve-Tech
+  * More portable AppImage thanks to @Samueru-sama
+  * Various back-end bugfixes
+  * FreeBSD compilation fixes by @ocochard
+
+ -- Quentin Lienhardt <pro@quentium.fr>  Tue, 11 Apr 2025 17:00:00 +0100
+
+nvtop (3.1.0-1) focal; urgency=medium
+
+  * Added support for the following hardware accelerators/GPUs:
+  * More Adreno GPUs thanks to the panfrost linux driver
+  * Mac GPUs (tested on M1 and M2 by the community)
+  * Huawei Ascend accelerators
+  * Don't call handlers for GPUs that are marked as not to be monitored
+  * Fix crash when the configuration file path could not be discovered through user environment variables (XDG_HOME etc)
+
+ -- Quentin Lienhardt <pro@quentium.fr>  Tue, 1 Mar 2024 12:00:00 +0100

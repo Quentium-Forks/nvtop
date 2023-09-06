@@ -1,0 +1,15 @@
+Source: nvtop
+Section: utils
+Priority: optional
+Maintainer: Quentin Lienhardt <pro@quentium.fr>
+Build-Depends: debhelper (>= 12)
+Standards-Version: 4.7.2
+Homepage: https://github.com/Quentium-Forks/nvtop
+Vcs-Browser: https://github.com/Quentium-Forks/nvtop
+Vcs-Git: https://github.com/Quentium-Forks/nvtop.git
+
+Package: nvtop
+Architecture: all
+Depends: ${misc:Depends}
+Recommends: systemd
+Description: NVTOP stands for Neat Videocard TOP, a (h)top like task monitor for AMD, Intel and NVIDIA GPUs. It can handle multiple GPUs and print information about them in a htop-familiar way.
