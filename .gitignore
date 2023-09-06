@@ -1,6 +1,6 @@
-*.o
-*ctags
+.vscode/
+.idea/
 build/
+release/
 cmake-build*/
-.vscode
-.idea
+ld

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+unlink /usr/bin/nvtop
+rm -rf /usr/share/nvtop
+
+exit 0 
