@@ -1,0 +1,10 @@
+nvtop (3.1.0-1) focal; urgency=medium
+
+  * Added support for the following hardware accelerators/GPUs:
+  * More Adreno GPUs thanks to the panfrost linux driver
+  * Mac GPUs (tested on M1 and M2 by the community)
+  * Huawei Ascend accelerators
+  * Don't call handlers for GPUs that are marked as not to be monitored
+  * Fix crash when the configuration file path could not be discovered through user environment variables (XDG_HOME etc)
+
+ -- Quentin Lienhardt <pro@quentium.fr>  Tue, 1 Mar 2024 12:00:00 +0100
