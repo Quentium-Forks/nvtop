@@ -28,6 +28,10 @@ rm linuxdeploy-x86_64.AppImage
 
 if [ "$1" == "deb" ]; then
     cd release/$DIR
+    # number of commits since last tag
+    COMMITS=$(git rev-list $(git describe --tags --abbrev=0)..HEAD --count)
+    # increase version number
+    sed -i "s/$VERSION-1/$VERSION-$COMMITS/g" debian/changelog
     dh_make --createorig --indep --yes
     debuild --no-lintian -us -uc
 fi
