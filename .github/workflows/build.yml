@@ -28,6 +28,9 @@ jobs:
           fetch-tags: true
           filter: tree:0
 
+      - name: Fetch tags
+        run: git fetch --prune --unshallow --tags
+
       - name: Install libraries
         run: |
           sudo apt-get install libncurses5-dev libncursesw5-dev libdrm-dev libsystemd-dev libudev-dev
