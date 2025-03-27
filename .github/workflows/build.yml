@@ -28,9 +28,6 @@ jobs:
           fetch-tags: true
           filter: tree:0
 
-      - name: Fetch tags
-        run: git fetch --prune --tags
-
       - name: Install libraries
         run: |
           sudo apt-get install libncurses5-dev libncursesw5-dev libdrm-dev libsystemd-dev libudev-dev
@@ -55,6 +52,8 @@ jobs:
       - name: Retrieve number of commits since last tag
         id: get_commits
         run: |
+          git fetch --prune --tags
+          git describe --tags
           echo "commits=$(git rev-list $(git describe --tags --abbrev=0)..HEAD --count)" >> $GITHUB_ENV
           echo "version=$(git describe --tags --abbrev=0 | cut -d 'v' -f 2)" >> $GITHUB_ENV
 
