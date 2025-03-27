@@ -14,6 +14,7 @@ mkdir -p release/$DIR/nvtop
 cp -r desktop debian release/$DIR
 cp -r build/src/* release/$DIR/nvtop
 cp desktop/nvtop.svg release/$DIR/nvtop
+cat desktop/nvtop.desktop > release/$DIR/nvtop/default.desktop
 
 # linuxdeploy
 wget -qc https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
@@ -22,7 +23,7 @@ chmod +x linuxdeploy-x86_64.AppImage
 cmake -S . -B build -DNVIDIA_SUPPORT=ON -DAMDGPU_SUPPORT=ON -DCMAKE_INSTALL_PREFIX=/usr
 DESTDIR=../release/$DIR cmake --build build --target install
 ./linuxdeploy-x86_64.AppImage --appdir release/$DIR -i release/$DIR/nvtop/nvtop.svg -d release/$DIR/desktop/nvtop.desktop --output appimage
-mv nvtop-*.AppImage release
+mv nvtop-$VERSION-x86_64.AppImage release
 
 rm linuxdeploy-x86_64.AppImage
 
