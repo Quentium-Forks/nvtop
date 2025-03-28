@@ -3,8 +3,6 @@ name: Build NVTOP Application
 on:
   workflow_dispatch:
   push:
-    tags:
-      - "*"
 
 jobs:
   build:
