@@ -11,18 +11,14 @@ jobs:
     name: Build App
     strategy:
       matrix:
-        os: [ubuntu-24.04, ubuntu-22.04, ubuntu-20.04]
+        os: [ubuntu-24.04]
         include:
           - os: ubuntu-24.04
             codename: "noble"
-          - os: ubuntu-22.04
-            codename: "jammy"
-          - os: ubuntu-20.04
-            codename: "focal"
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@main
         with:
           fetch-depth: 0
           fetch-tags: true
@@ -53,7 +49,6 @@ jobs:
         id: get_commits
         run: |
           git fetch --prune --tags
-          git describe --tags
           echo "commits=$(git rev-list $(git describe --tags --abbrev=0)..HEAD --count)" >> $GITHUB_ENV
           echo "version=$(git describe --tags --abbrev=0 | cut -d 'v' -f 2)" >> $GITHUB_ENV
 
