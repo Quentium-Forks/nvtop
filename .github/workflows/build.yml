@@ -16,11 +16,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@main
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-          filter: tree:0
+        uses: actions/checkout@v4
 
       - name: Install libraries
         run: |
@@ -43,12 +39,11 @@ jobs:
             ${{ github.workspace }}/release/nvtop_*.deb
             ${{ github.workspace }}/release/nvtop-*.AppImage
 
-      - name: Retrieve number of commits since last tag
-        id: get_commits
+      - name: Get current date
+        id: get_date
         run: |
-          git fetch --prune --tags
-          echo "commits=$(git rev-list $(git describe --tags --abbrev=0)..HEAD --count)" >> $GITHUB_ENV
-          echo "version=$(git describe --tags --abbrev=0 | cut -d 'v' -f 2)" >> $GITHUB_ENV
+          date=$(date +%Y%m%d)
+          echo "date=$date" >> $GITHUB_ENV
 
       - name: Publish PPA package
         uses: yuezk/publish-ppa-package@main
@@ -62,4 +57,4 @@ jobs:
           gpg_private_key: ${{ secrets.PPA_GPG_PRIVATE_KEY }}
           gpg_passphrase: ${{ secrets.PPA_GPG_PASSPHRASE }}
           series: "noble jammy focal"
-          new_version_template: "{VERSION}-${{ env.commits }}+{SERIES}"
+          new_version_template: "{VERSION}-1+${{ env.date }}+{SERIES}"
