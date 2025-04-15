@@ -101,13 +101,16 @@ jobs:
         run: |
           LAST_TAG=$(git describe --tags --abbrev=0 || echo "HEAD")
           COMMITS=$(git rev-list --count $LAST_TAG..HEAD)
+          echo "last_tag=$LAST_TAG" >> $GITHUB_ENV
           echo "commit_count=$COMMITS" >> $GITHUB_ENV
 
       - name: Update debian files
         run: |
-          sed -i "s/-1)/+${{ env.commit_count }}-1)/g" ${{ github.workspace }}/debian/changelog
+          sed -i "s/${{ env.last_tag }}-/${{ env.last_tag }}+${{ env.commit_count }}-/g" ${{ github.workspace }}/debian/changelog
           sed -i "s/^nvtop/nvtop-nightly/g" ${{ github.workspace }}/debian/changelog
           sed -i "s/ nvtop$/ nvtop-nightly/g" ${{ github.workspace }}/debian/control
+          REVISION=$(grep -oP '\-\d+' debian/changelog | head -n 1 | cut -d '-' -f 2)
+          echo "revision=$REVISION" >> $GITHUB_ENV
 
       - name: Display debian folder
         run: |
@@ -131,4 +134,5 @@ jobs:
           gpg_private_key: ${{ secrets.PPA_GPG_PRIVATE_KEY }}
           gpg_passphrase: ${{ secrets.PPA_GPG_PASSPHRASE }}
           series: "noble jammy"
+          revision: ${{ env.revision }}
           new_version_template: "{VERSION}-{REVISION}+{SERIES}"

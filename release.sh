@@ -23,7 +23,7 @@ if [ "$1" == "nightly" ]; then
     echo "Build number: $COMMITS"
 
     # Increase version number
-    sed -i "s/($VERSION-1)/($VERSION+$COMMITS-1)/g" release/$DIR/debian/changelog
+    sed -i "s/$VERSION-/$VERSION+$COMMITS-/g" release/$DIR/debian/changelog
 
     # Change package name
     sed -i "s/^nvtop/nvtop-nightly/g" release/$DIR/debian/changelog
