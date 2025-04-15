@@ -1,4 +1,4 @@
-nvtop (3.2.0-1) focal; urgency=medium
+nvtop (3.2.0-1) stable; urgency=medium
 
   * Intel XE driver support thanks to @Steve-Tech
   * Supports more metrics when CAP_PERFMON is given to nvtop. See the Intel section of the README
@@ -16,7 +16,7 @@ nvtop (3.2.0-1) focal; urgency=medium
 
  -- Quentin Lienhardt <pro@quentium.fr>  Tue, 11 Apr 2025 17:00:00 +0100
 
-nvtop (3.1.0-1) focal; urgency=medium
+nvtop (3.1.0-1) stable; urgency=medium
 
   * Added support for the following hardware accelerators/GPUs:
   * More Adreno GPUs thanks to the panfrost linux driver
