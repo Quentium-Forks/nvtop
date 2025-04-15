@@ -45,7 +45,11 @@ chmod +x linuxdeploy-x86_64.AppImage
 cmake -S . -B build -DNVIDIA_SUPPORT=ON -DAMDGPU_SUPPORT=ON -DCMAKE_INSTALL_PREFIX=/usr
 DESTDIR=../release/$DIR cmake --build build --target install
 ./linuxdeploy-x86_64.AppImage --appdir release/$DIR -i release/$DIR/nvtop/nvtop.svg -d release/$DIR/desktop/nvtop.desktop --output appimage
-mv nvtop-$VERSION-x86_64.AppImage release
+if [ "$1" == "nightly" ]; then
+    mv nvtop-$VERSION-x86_64.AppImage release/nvtop-nightly-$VERSION-x86_64.AppImage
+else
+    mv nvtop-$VERSION-x86_64.AppImage release
+fi
 
 rm linuxdeploy-x86_64.AppImage
 
