@@ -50,6 +50,17 @@ jobs:
             ${{ github.workspace }}/release/nvtop_*.deb
             ${{ github.workspace }}/release/nvtop-*.AppImage
 
+      - name: Display debian folder
+        run: |
+          echo "Debian folder content:"
+          ls -la ${{ github.workspace }}/debian/
+          echo "Release folder content:"
+          ls -la ${{ github.workspace }}/release/
+          echo "Control file content:"
+          cat ${{ github.workspace }}/debian/control
+          echo "Changelog file content:"
+          cat ${{ github.workspace }}/debian/changelog
+
       - name: Publish PPA package
         uses: yuezk/publish-ppa-package@main
         if: matrix.codename == 'jammy'
@@ -62,6 +73,7 @@ jobs:
           gpg_private_key: ${{ secrets.PPA_GPG_PRIVATE_KEY }}
           gpg_passphrase: ${{ secrets.PPA_GPG_PASSPHRASE }}
           series: "noble jammy"
+          revision: 2
           new_version_template: "{VERSION}-{REVISION}+{SERIES}"
 
   nightly-build:
