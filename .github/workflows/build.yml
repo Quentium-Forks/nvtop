@@ -24,7 +24,7 @@ jobs:
           - os: ubuntu-22.04
             codename: "jammy"
     runs-on: ${{ matrix.os }}
-    if: ${{ github.event.inputs.nightly-build == 'false' }}
+    if: ${{ github.event_name == 'push' || github.event.inputs.nightly-build == 'false' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -50,9 +50,20 @@ jobs:
             ${{ github.workspace }}/release/nvtop_*.deb
             ${{ github.workspace }}/release/nvtop-*.AppImage
 
+      - name: Display debian folder
+        run: |
+          echo "Debian folder content:"
+          ls -la ${{ github.workspace }}/debian/
+          echo "Release folder content:"
+          ls -la ${{ github.workspace }}/release/
+          echo "Control file content:"
+          cat ${{ github.workspace }}/debian/control
+          echo "Changelog file content:"
+          cat ${{ github.workspace }}/debian/changelog
+
       - name: Publish PPA package
         uses: yuezk/publish-ppa-package@main
-        if: matrix.codename == 'jammy'
+        if: matrix.codename == 'jammy' && github.event_name != 'workflow_dispatch'
         with:
           tarball: ${{ github.workspace }}/release/nvtop-*.tar.gz
           debian_dir: ${{ github.workspace }}/debian/
@@ -63,6 +74,7 @@ jobs:
           gpg_passphrase: ${{ secrets.PPA_GPG_PASSPHRASE }}
           series: "noble jammy"
           new_version_template: "{VERSION}-{REVISION}+{SERIES}"
+          keep_changelog: true
 
   nightly-build:
     name: Build Nightly App
@@ -136,3 +148,4 @@ jobs:
           series: "noble jammy"
           revision: ${{ env.revision }}
           new_version_template: "{VERSION}-{REVISION}+{SERIES}"
+          keep_changelog: true
