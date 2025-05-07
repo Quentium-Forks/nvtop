@@ -75,6 +75,7 @@ jobs:
           series: "noble jammy"
           revision: 2
           new_version_template: "{VERSION}-{REVISION}+{SERIES}"
+          keep_changelog: true
 
   nightly-build:
     name: Build Nightly App
@@ -148,3 +149,4 @@ jobs:
           series: "noble jammy"
           revision: ${{ env.revision }}
           new_version_template: "{VERSION}-{REVISION}+{SERIES}"
+          keep_changelog: true
