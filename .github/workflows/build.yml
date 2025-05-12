@@ -121,6 +121,9 @@ jobs:
           sed -i "s/${{ env.last_tag }}-/${{ env.last_tag }}+${{ env.commit_count }}-/g" ${{ github.workspace }}/debian/changelog
           sed -i "s/^nvtop/nvtop-nightly/g" ${{ github.workspace }}/debian/changelog
           sed -i "s/ nvtop$/ nvtop-nightly/g" ${{ github.workspace }}/debian/control
+          sed -i "s/Architecture: all/Architecture: all\nProvides: nvtop/g" ${{ github.workspace }}/debian/control
+          sed -i "s/Architecture: all/Architecture: all\nConflicts: nvtop/g" ${{ github.workspace }}/debian/control
+          sed -i "s/Architecture: all/Architecture: all\nReplaces: nvtop/g" ${{ github.workspace }}/debian/control
           REVISION=$(grep -oP '\-\d+' debian/changelog | head -n 1 | cut -d '-' -f 2)
           echo "revision=$REVISION" >> $GITHUB_ENV
 

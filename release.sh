@@ -29,6 +29,11 @@ if [ "$1" == "nightly" ]; then
     sed -i "s/^nvtop/nvtop-nightly/g" release/$DIR/debian/changelog
     sed -i "s/ nvtop$/ nvtop-nightly/g" release/$DIR/debian/control
 
+    # Prevent conflict with nvtop
+    sed -i "s/Architecture: all/Architecture: all\nProvides: nvtop/g" release/$DIR/debian/control
+    sed -i "s/Architecture: all/Architecture: all\nConflicts: nvtop/g" release/$DIR/debian/control
+    sed -i "s/Architecture: all/Architecture: all\nReplaces: nvtop/g" release/$DIR/debian/control
+
     VERSION="$VERSION+$COMMITS"
     export VERSION=$VERSION
     mv release/$DIR release/nvtop-nightly-$VERSION
