@@ -3,13 +3,14 @@ VERSION=3.2.0.1
 DIR=nvtop-$VERSION
 export VERSION=$VERSION
 
-rm -rf release build
+rm -rf release build rpm/BUILDROOT rpm/*RPMS rpm/SOURCES
 mkdir release build
 cd build
 cmake -DCMAKE_BUILD_TYPE=Debug -DNVIDIA_SUPPORT=ON -DAMDGPU_SUPPORT=ON -DCMAKE_CXX_COMPILER=g++ ..
 make -j $(nproc)
 cd ..
 
+# assets
 mkdir -p release/$DIR/nvtop
 cp -r desktop debian release/$DIR
 cp -r build/src/* release/$DIR/nvtop
@@ -43,10 +44,11 @@ fi
 # tarball
 tar -czf release/$DIR.tar.gz -C release $DIR
 
-# linuxdeploy AppImage
+# linuxdeploy
 wget -qc https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
 chmod +x linuxdeploy-x86_64.AppImage
 
+# appimage
 cmake -S . -B build -DNVIDIA_SUPPORT=ON -DAMDGPU_SUPPORT=ON -DCMAKE_INSTALL_PREFIX=/usr
 DESTDIR=../release/$DIR cmake --build build --target install
 ./linuxdeploy-x86_64.AppImage --appdir release/$DIR -i release/$DIR/nvtop/nvtop.svg -d release/$DIR/desktop/nvtop.desktop --output appimage
@@ -62,3 +64,18 @@ rm linuxdeploy-x86_64.AppImage
 cd release/$DIR
 dh_make --createorig --indep --yes
 debuild --no-lintian -us -uc
+cd ../..
+
+# rpm package
+mkdir -p rpm/SOURCES/
+cp release/$DIR.tar.gz rpm/SOURCES/
+if [ "$1" == "nightly" ]; then
+    cp rpm/SPECS/nvtop.spec rpm/SPECS/nvtop-nightly.spec
+    sed -i "s/^Name:\s\+nvtop$/Name: nvtop-nightly/g" rpm/SPECS/nvtop-nightly.spec
+    sed -i "s/^Version:\s\+.*$/Version: $VERSION/g" rpm/SPECS/nvtop-nightly.spec
+    rpmbuild -bb --build-in-place --define "_topdir $(pwd)/rpm" rpm/SPECS/nvtop-nightly.spec
+    mv rpm/RPMS/x86_64/nvtop-nightly-$VERSION-1.x86_64.rpm release/nvtop-nightly-$VERSION.x86_64.rpm
+else
+    rpmbuild -bb --build-in-place --define "_topdir $(pwd)/rpm" rpm/SPECS/nvtop.spec
+    mv rpm/RPMS/x86_64/nvtop-$VERSION-1.x86_64.rpm release/nvtop-$VERSION.x86_64.rpm
+fi
