@@ -13,4 +13,4 @@ Package: nvtop
 Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}, libc6 (>= 2.34), libncursesw6 (>= 6), libsystemd0 (>= 240), libtinfo6 (>= 6)
 Recommends: systemd
-Description: NVTOP stands for Neat Videocard TOP, a (h)top like task monitor for AMD, Intel and NVIDIA GPUs. It can handle multiple GPUs and print information about them in a htop-familiar way.
+Description: NVTOP stands for Neat Videocard TOP, a (h)top like task monitor for GPUs and accelerators. It can handle multiple GPUs and print information about them in a htop-familiar way.

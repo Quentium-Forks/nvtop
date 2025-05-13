@@ -48,6 +48,7 @@ jobs:
           name: nvtop-${{ matrix.codename }}
           path: |
             ${{ github.workspace }}/release/nvtop_*.deb
+            ${{ github.workspace }}/release/nvtop-*.rpm
             ${{ github.workspace }}/release/nvtop-*.AppImage
 
       - name: Display debian folder
@@ -106,6 +107,7 @@ jobs:
           name: nvtop-nightly
           path: |
             ${{ github.workspace }}/release/nvtop-nightly_*.deb
+            ${{ github.workspace }}/release/nvtop-nightly-*.rpm
             ${{ github.workspace }}/release/nvtop-nightly-*.AppImage
 
       - name: Get commit count
