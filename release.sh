@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION=3.2.0
+VERSION=3.2.0.1
 DIR=nvtop-$VERSION
 export VERSION=$VERSION
 

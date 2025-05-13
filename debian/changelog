@@ -1,3 +1,15 @@
+nvtop (3.2.0.1-1) stable; urgency=medium
+
+  * Build and publish with jammy dependencies (oldest supported)
+  * Fix upload workflow artifacts for nightly AppImage
+  * Fix debian files and upgrading package not unpacked
+  * Exclude revision number in sed + specify it to PPA
+  * Fix debian dependencies
+  * Keep current changelog in publish-ppa-package & no publish when dispatch
+  * Prevent conflict with nvtop with nightly build
+
+ -- Quentin Lienhardt <pro@quentium.fr>  Tue, 13 Apr 2025 12:00:00 +0100
+
 nvtop (3.2.0-1) stable; urgency=medium
 
   * Intel XE driver support thanks to @Steve-Tech
