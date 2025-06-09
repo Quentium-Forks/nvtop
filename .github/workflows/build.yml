@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       nightly-build:
-        description: 'Nightly build'
+        description: "Nightly build"
         type: boolean
         required: true
         default: false
@@ -17,12 +17,16 @@ jobs:
     name: Build App
     strategy:
       matrix:
-        os: [ubuntu-24.04, ubuntu-22.04]
+        os: [ubuntu-24.04, ubuntu-24.04-arm, ubuntu-22.04, ubuntu-22.04-arm]
         include:
           - os: ubuntu-24.04
             codename: "noble"
+          - os: ubuntu-24.04-arm
+            codename: "noble-arm"
           - os: ubuntu-22.04
             codename: "jammy"
+          - os: ubuntu-22.04-arm
+            codename: "jammy-arm"
     runs-on: ${{ matrix.os }}
     if: ${{ github.event_name == 'push' || github.event.inputs.nightly-build == 'false' }}
     steps:
@@ -79,7 +83,7 @@ jobs:
 
   nightly-build:
     name: Build Nightly App
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-22.04, ubuntu-22.04-arm
     if: ${{ github.event.inputs.nightly-build == 'true' }}
     steps:
       - name: Checkout
