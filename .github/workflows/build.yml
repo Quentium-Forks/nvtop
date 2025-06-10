@@ -40,7 +40,7 @@ jobs:
 
       - name: Install build tools
         run: |
-          sudo apt-get install -y dh-make devscripts build-essential lintian
+          sudo apt-get install -y dh-make devscripts build-essential
 
       - name: Build and make release
         run: |
