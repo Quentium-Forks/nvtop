@@ -1,6 +1,7 @@
 #!/bin/bash
 VERSION=3.2.0.1
 DIR=nvtop-$VERSION
+ARCH=$(uname -m)
 export VERSION=$VERSION
 
 rm -rf release build rpm/BUILDROOT rpm/*RPMS rpm/SOURCES
@@ -45,20 +46,20 @@ fi
 tar -czf release/$DIR.tar.gz -C release $DIR
 
 # linuxdeploy
-wget -qc https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
-chmod +x linuxdeploy-x86_64.AppImage
+wget -qc https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-$ARCH.AppImage
+chmod +x linuxdeploy-$ARCH.AppImage
 
 # appimage
 cmake -S . -B build -DNVIDIA_SUPPORT=ON -DAMDGPU_SUPPORT=ON -DCMAKE_INSTALL_PREFIX=/usr
 DESTDIR=../release/$DIR cmake --build build --target install
-./linuxdeploy-x86_64.AppImage --appdir release/$DIR -i release/$DIR/nvtop/nvtop.svg -d release/$DIR/desktop/nvtop.desktop --output appimage
+./linuxdeploy-$ARCH.AppImage --appdir release/$DIR -i release/$DIR/nvtop/nvtop.svg -d release/$DIR/desktop/nvtop.desktop --output appimage
 if [ "$1" == "nightly" ]; then
-    mv nvtop-$VERSION-x86_64.AppImage release/nvtop-nightly-$VERSION-x86_64.AppImage
+    mv nvtop-$VERSION-$ARCH.AppImage release/nvtop-nightly-$VERSION-$ARCH.AppImage
 else
-    mv nvtop-$VERSION-x86_64.AppImage release
+    mv nvtop-$VERSION-$ARCH.AppImage release
 fi
 
-rm linuxdeploy-x86_64.AppImage
+rm linuxdeploy-$ARCH.AppImage
 
 # debian package
 cd release/$DIR
@@ -77,8 +78,8 @@ if [ "$1" == "nightly" ]; then
     sed -i "s/^Name:\s\+nvtop$/Name: nvtop-nightly/g" rpm/SPECS/nvtop-nightly.spec
     sed -i "s/^Version:\s\+.*$/Version: $VERSION/g" rpm/SPECS/nvtop-nightly.spec
     rpmbuild -bb --build-in-place --define "_topdir $(pwd)/rpm" rpm/SPECS/nvtop-nightly.spec
-    mv rpm/RPMS/x86_64/nvtop-nightly-$VERSION-1.x86_64.rpm release/nvtop-nightly-$VERSION.x86_64.rpm
+    mv rpm/RPMS/$ARCH/nvtop-nightly-$VERSION-1.$ARCH.rpm release/nvtop-nightly-$VERSION.$ARCH.rpm
 else
     rpmbuild -bb --build-in-place --define "_topdir $(pwd)/rpm" rpm/SPECS/nvtop.spec
-    mv rpm/RPMS/x86_64/nvtop-$VERSION-1.x86_64.rpm release/nvtop-$VERSION.x86_64.rpm
+    mv rpm/RPMS/$ARCH/nvtop-$VERSION-1.$ARCH.rpm release/nvtop-$VERSION.$ARCH.rpm
 fi
