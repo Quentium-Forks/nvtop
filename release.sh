@@ -2,6 +2,7 @@
 VERSION=3.2.0.1
 DIR=nvtop-$VERSION
 ARCH=$(uname -m)
+ARCH_DPKG=$(dpkg --print-architecture)
 export VERSION=$VERSION
 
 rm -rf release build rpm/BUILDROOT rpm/*RPMS rpm/SOURCES
@@ -32,15 +33,18 @@ if [ "$1" == "nightly" ]; then
     sed -i "s/ nvtop$/ nvtop-nightly/g" release/$DIR/debian/control
 
     # Prevent conflict with nvtop
-    sed -i "s/Architecture: all/Architecture: all\nProvides: nvtop/g" release/$DIR/debian/control
-    sed -i "s/Architecture: all/Architecture: all\nConflicts: nvtop/g" release/$DIR/debian/control
-    sed -i "s/Architecture: all/Architecture: all\nReplaces: nvtop/g" release/$DIR/debian/control
+    sed -i "s/Recommends: systemd/Provides: nvtop\nRecommends: systemd\n/g" release/$DIR/debian/control
+    sed -i "s/Recommends: systemd/Conflicts: nvtop\nRecommends: systemd\n/g" release/$DIR/debian/control
+    sed -i "s/Recommends: systemd/Replaces: nvtop\nRecommends: systemd\n/g" release/$DIR/debian/control
 
     VERSION="$VERSION+$COMMITS"
     export VERSION=$VERSION
     mv release/$DIR release/nvtop-nightly-$VERSION
     DIR=nvtop-nightly-$VERSION
 fi
+
+# Change architecture
+sed -i "s/^Architecture:\s\+.*$/Architecture: $ARCH_DPKG/g" release/$DIR/debian/control
 
 # tarball
 tar -czf release/$DIR.tar.gz -C release $DIR
@@ -71,14 +75,21 @@ cd ../..
 mkdir -p rpm/SOURCES/
 cp release/$DIR.tar.gz rpm/SOURCES/
 if [ "$1" == "nightly" ]; then
+    # Create a new spec file for nightly builds
     cp rpm/SPECS/nvtop.spec rpm/SPECS/nvtop-nightly.spec
+    # Change package name
     sed -i "s/^Name:\s\+nvtop$/Name: nvtop-nightly/g" rpm/SPECS/nvtop-nightly.spec
+    # Increase version number
     sed -i "s/^Version:\s\+.*$/Version: $VERSION/g" rpm/SPECS/nvtop-nightly.spec
+    # Change architecture
     sed -i "s/^BuildArch:\s\+.*$/BuildArch: $ARCH/g" rpm/SPECS/nvtop-nightly.spec
+
     rpmbuild -bb --build-in-place --define "_topdir $(pwd)/rpm" rpm/SPECS/nvtop-nightly.spec
     mv rpm/RPMS/$ARCH/nvtop-nightly-$VERSION-1.$ARCH.rpm release/nvtop-nightly-$VERSION.$ARCH.rpm
 else
+    # Change architecture
     sed -i "s/^BuildArch:\s\+.*$/BuildArch: $ARCH/g" rpm/SPECS/nvtop.spec
+
     rpmbuild -bb --build-in-place --define "_topdir $(pwd)/rpm" rpm/SPECS/nvtop.spec
     mv rpm/RPMS/$ARCH/nvtop-$VERSION-1.$ARCH.rpm release/nvtop-$VERSION.$ARCH.rpm
 fi
