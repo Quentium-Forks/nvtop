@@ -8,6 +8,11 @@ on:
         type: boolean
         required: true
         default: false
+      publish:
+        description: "Publish to PPA"
+        type: boolean
+        required: true
+        default: false
   push:
     tags:
       - "*"
@@ -33,14 +38,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Update apt repositories
+        run: sudo apt update
+
       - name: Install libraries
         run: |
-          sudo apt-get install libncurses5-dev libncursesw5-dev libdrm-dev libsystemd-dev libudev-dev
-          sudo apt-get install libfuse2
+          sudo apt install libncurses5-dev libncursesw5-dev libdrm-dev libsystemd-dev libudev-dev
+          sudo apt install libfuse2
 
       - name: Install build tools
         run: |
-          sudo apt-get install -y dh-make devscripts build-essential lintian
+          sudo apt install -y dh-make devscripts build-essential lintian
 
       - name: Build and make release
         run: |
@@ -83,7 +91,10 @@ jobs:
 
   nightly-build:
     name: Build Nightly App
-    runs-on: ubuntu-22.04, ubuntu-22.04-arm
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, ubuntu-22.04-arm]
+    runs-on: ${{ matrix.os }}
     if: ${{ github.event.inputs.nightly-build == 'true' }}
     steps:
       - name: Checkout
@@ -92,14 +103,17 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
+      - name: Update apt repositories
+        run: sudo apt update
+
       - name: Install libraries
         run: |
-          sudo apt-get install libncurses5-dev libncursesw5-dev libdrm-dev libsystemd-dev libudev-dev
-          sudo apt-get install libfuse2
+          sudo apt install libncurses5-dev libncursesw5-dev libdrm-dev libsystemd-dev libudev-dev
+          sudo apt install libfuse2
 
       - name: Install build tools
         run: |
-          sudo apt-get install -y dh-make devscripts build-essential lintian
+          sudo apt install -y dh-make devscripts build-essential lintian
 
       - name: Build and make nightly release
         run: |
@@ -146,6 +160,7 @@ jobs:
 
       - name: Publish PPA package
         uses: yuezk/publish-ppa-package@main
+        if: github.event.inputs.publish == 'true'
         with:
           tarball: ${{ github.workspace }}/release/nvtop-nightly-*.tar.gz
           debian_dir: ${{ github.workspace }}/debian/
