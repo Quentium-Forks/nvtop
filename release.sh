@@ -70,7 +70,6 @@ cd ../..
 # rpm package
 mkdir -p rpm/SOURCES/
 cp release/$DIR.tar.gz rpm/SOURCES/
-ls -al rpm/SOURCES/
 if [ "$1" == "nightly" ]; then
     cp rpm/SPECS/nvtop.spec rpm/SPECS/nvtop-nightly.spec
     sed -i "s/^Name:\s\+nvtop$/Name: nvtop-nightly/g" rpm/SPECS/nvtop-nightly.spec

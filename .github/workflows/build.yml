@@ -94,6 +94,11 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-22.04, ubuntu-22.04-arm]
+        include:
+          - os: ubuntu-22.04
+            codename: "jammy"
+          - os: ubuntu-22.04-arm
+            codename: "jammy-arm"
     runs-on: ${{ matrix.os }}
     if: ${{ github.event.inputs.nightly-build == 'true' }}
     steps:
@@ -122,7 +127,7 @@ jobs:
       - name: Upload workflow artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: nvtop-nightly
+          name: nvtop-nightly-${{ matrix.codename }}
           path: |
             ${{ github.workspace }}/release/nvtop-nightly_*.deb
             ${{ github.workspace }}/release/nvtop-nightly-*.rpm
