@@ -65,21 +65,21 @@ rm linuxdeploy-$ARCH.AppImage
 cd release/$DIR
 dh_make --createorig --indep --yes
 debuild --no-lintian -us -uc
-ls -al
 cd ../..
-ls -al
-ls -al release/
 
 # rpm package
 mkdir -p rpm/SOURCES/
 cp release/$DIR.tar.gz rpm/SOURCES/
+ls -al rpm/SOURCES/
 if [ "$1" == "nightly" ]; then
     cp rpm/SPECS/nvtop.spec rpm/SPECS/nvtop-nightly.spec
     sed -i "s/^Name:\s\+nvtop$/Name: nvtop-nightly/g" rpm/SPECS/nvtop-nightly.spec
     sed -i "s/^Version:\s\+.*$/Version: $VERSION/g" rpm/SPECS/nvtop-nightly.spec
+    sed -i "s/^BuildArch:\s\+.*$/BuildArch: $ARCH/g" rpm/SPECS/nvtop-nightly.spec
     rpmbuild -bb --build-in-place --define "_topdir $(pwd)/rpm" rpm/SPECS/nvtop-nightly.spec
     mv rpm/RPMS/$ARCH/nvtop-nightly-$VERSION-1.$ARCH.rpm release/nvtop-nightly-$VERSION.$ARCH.rpm
 else
+    sed -i "s/^BuildArch:\s\+.*$/BuildArch: $ARCH/g" rpm/SPECS/nvtop.spec
     rpmbuild -bb --build-in-place --define "_topdir $(pwd)/rpm" rpm/SPECS/nvtop.spec
     mv rpm/RPMS/$ARCH/nvtop-$VERSION-1.$ARCH.rpm release/nvtop-$VERSION.$ARCH.rpm
 fi
