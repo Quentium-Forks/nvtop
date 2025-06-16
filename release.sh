@@ -64,7 +64,10 @@ rm linuxdeploy-x86_64.AppImage
 cd release/$DIR
 dh_make --createorig --indep --yes
 debuild --no-lintian -us -uc
+ls -al
 cd ../..
+ls -al
+ls -al release/
 
 # rpm package
 mkdir -p rpm/SOURCES/
