@@ -33,9 +33,9 @@ if [ "$1" == "nightly" ]; then
     sed -i "s/ nvtop$/ nvtop-nightly/g" release/$DIR/debian/control
 
     # Prevent conflict with nvtop
-    sed -i "s/Recommends: systemd/Provides: nvtop\nRecommends: systemd\n/g" release/$DIR/debian/control
-    sed -i "s/Recommends: systemd/Conflicts: nvtop\nRecommends: systemd\n/g" release/$DIR/debian/control
-    sed -i "s/Recommends: systemd/Replaces: nvtop\nRecommends: systemd\n/g" release/$DIR/debian/control
+    sed -i "s/Recommends: systemd/Provides: nvtop\nRecommends: systemd/g" release/$DIR/debian/control
+    sed -i "s/Recommends: systemd/Conflicts: nvtop\nRecommends: systemd/g" release/$DIR/debian/control
+    sed -i "s/Recommends: systemd/Replaces: nvtop\nRecommends: systemd/g" release/$DIR/debian/control
 
     VERSION="$VERSION+$COMMITS"
     export VERSION=$VERSION
