@@ -3,12 +3,13 @@ VERSION=3.2.0.1
 DIR=nvtop-$VERSION
 export VERSION=$VERSION
 
+# cleanup
 rm -rf release build rpm/BUILDROOT rpm/*RPMS rpm/SOURCES
-mkdir release build
-cd build
-cmake -DCMAKE_BUILD_TYPE=Debug -DNVIDIA_SUPPORT=ON -DAMDGPU_SUPPORT=ON -DCMAKE_CXX_COMPILER=g++ ..
-make -j $(nproc)
-cd ..
+
+# build
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DNVIDIA_SUPPORT=ON -DAMDGPU_SUPPORT=ON
+cmake --build build -j $(nproc)
+strip -s build/src/nvtop
 
 # assets
 mkdir -p release/$DIR/nvtop
