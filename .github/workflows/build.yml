@@ -173,7 +173,7 @@ jobs:
 
       - name: Publish PPA package
         uses: yuezk/publish-ppa-package@main
-        if: github.event.inputs.publish == 'true'
+        if: github.event.inputs.publish == 'true' && matrix.codename == 'jammy'
         with:
           tarball: ${{ github.workspace }}/release/nvtop-nightly-*.tar.gz
           debian_dir: ${{ github.workspace }}/debian/
