@@ -85,7 +85,7 @@ jobs:
 
       - name: Publish PPA package
         uses: yuezk/publish-ppa-package@main
-        if: github.event_name != 'workflow_dispatch' && (matrix.codename == 'jammy' || matrix.codename == 'jammy-arm')
+        if: github.event_name != 'workflow_dispatch' && matrix.codename == 'jammy'
         with:
           tarball: ${{ github.workspace }}/release/nvtop-*.tar.gz
           debian_dir: ${{ github.workspace }}/debian/
