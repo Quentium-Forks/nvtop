@@ -26,16 +26,12 @@ jobs:
         include:
           - os: ubuntu-24.04
             codename: "noble"
-            arch_dpkg: "amd64"
           - os: ubuntu-24.04-arm
             codename: "noble-arm"
-            arch_dpkg: "aarch64"
           - os: ubuntu-22.04
             codename: "jammy"
-            arch_dpkg: "amd64"
           - os: ubuntu-22.04-arm
             codename: "jammy-arm"
-            arch_dpkg: "aarch64"
     runs-on: ${{ matrix.os }}
     if: ${{ github.event_name == 'push' || github.event.inputs.nightly-build == 'false' }}
     steps:
@@ -70,7 +66,7 @@ jobs:
       - name: Update debian files
         if: github.event.inputs.publish == 'true'
         run: |
-          sed -i "s/^Architecture:\s\+.*$/Architecture: ${{ matrix.arch_dpkg }}/g" ${{ github.workspace }}/debian/control
+          sed -i "s/^Architecture:\s\+.*$/Architecture: all/g" ${{ github.workspace }}/debian/control
 
       - name: Display debian folder
         run: |
@@ -106,10 +102,8 @@ jobs:
         include:
           - os: ubuntu-22.04
             arch: "x86_64"
-            arch_dpkg: "amd64"
           - os: ubuntu-22.04-arm
             arch: "arm64"
-            arch_dpkg: "aarch64"
     runs-on: ${{ matrix.os }}
     if: ${{ github.event.inputs.nightly-build == 'true' }}
     steps:
@@ -162,7 +156,7 @@ jobs:
           sed -i "s/Recommends: systemd/Provides: nvtop\nRecommends: systemd/g" ${{ github.workspace }}/debian/control
           sed -i "s/Recommends: systemd/Conflicts: nvtop\nRecommends: systemd/g" ${{ github.workspace }}/debian/control
           sed -i "s/Recommends: systemd/Replaces: nvtop\nRecommends: systemd/g" ${{ github.workspace }}/debian/control
-          sed -i "s/^Architecture:\s\+.*$/Architecture: ${{ matrix.arch_dpkg }}/g" ${{ github.workspace }}/debian/control
+          sed -i "s/^Architecture:\s\+.*$/Architecture: all/g" ${{ github.workspace }}/debian/control
           REVISION=$(grep -oP '\-\d+' debian/changelog | head -n 1 | cut -d '-' -f 2)
           echo "revision=$REVISION" >> $GITHUB_ENV
 
