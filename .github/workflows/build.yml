@@ -66,7 +66,7 @@ jobs:
       - name: Update debian files
         if: github.event.inputs.publish == 'true'
         run: |
-          sed -i "s/^Architecture:\s\+.*$/Architecture: all/g" ${{ github.workspace }}/debian/control
+          sed -i "s/^Architecture:\s\+.*$/Architecture: any/g" ${{ github.workspace }}/debian/control
 
       - name: Display debian folder
         run: |
@@ -96,15 +96,7 @@ jobs:
 
   nightly-build:
     name: Build Nightly App
-    strategy:
-      matrix:
-        os: [ubuntu-22.04, ubuntu-22.04-arm]
-        include:
-          - os: ubuntu-22.04
-            arch: "x86_64"
-          - os: ubuntu-22.04-arm
-            arch: "arm64"
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-22.04
     if: ${{ github.event.inputs.nightly-build == 'true' }}
     steps:
       - name: Checkout
@@ -132,7 +124,7 @@ jobs:
       - name: Upload workflow artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: nvtop-nightly-${{ matrix.arch }}
+          name: nvtop-nightly
           path: |
             ${{ github.workspace }}/release/nvtop-nightly_*.deb
             ${{ github.workspace }}/release/nvtop-nightly-*.rpm
@@ -156,7 +148,7 @@ jobs:
           sed -i "s/Recommends: systemd/Provides: nvtop\nRecommends: systemd/g" ${{ github.workspace }}/debian/control
           sed -i "s/Recommends: systemd/Conflicts: nvtop\nRecommends: systemd/g" ${{ github.workspace }}/debian/control
           sed -i "s/Recommends: systemd/Replaces: nvtop\nRecommends: systemd/g" ${{ github.workspace }}/debian/control
-          sed -i "s/^Architecture:\s\+.*$/Architecture: all/g" ${{ github.workspace }}/debian/control
+          sed -i "s/^Architecture:\s\+.*$/Architecture: any/g" ${{ github.workspace }}/debian/control
           REVISION=$(grep -oP '\-\d+' debian/changelog | head -n 1 | cut -d '-' -f 2)
           echo "revision=$REVISION" >> $GITHUB_ENV
 
@@ -173,7 +165,7 @@ jobs:
 
       - name: Publish PPA package
         uses: yuezk/publish-ppa-package@main
-        if: github.event.inputs.publish == 'true' && matrix.codename == 'jammy'
+        if: github.event.inputs.publish == 'true'
         with:
           tarball: ${{ github.workspace }}/release/nvtop-nightly-*.tar.gz
           debian_dir: ${{ github.workspace }}/debian/
