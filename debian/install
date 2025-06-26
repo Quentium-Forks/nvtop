@@ -1,3 +1,2 @@
-nvtop/nvtop usr/bin
 desktop/*.desktop usr/share/applications
 desktop/*.svg usr/share/icons
