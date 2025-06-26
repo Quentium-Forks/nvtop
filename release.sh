@@ -47,8 +47,7 @@ fi
 sed -i "s/^Architecture:\s\+.*$/Architecture: $ARCH_DPKG/g" release/$DIR/debian/control
 
 # tarball
-tar -czf release/$DIR.tar.gz --exclude='nvtop/nvtop' -C release $DIR
-tar -czf release/$DIR-binary.tar.gz -C release $DIR
+tar -czf release/$DIR.tar.gz -C release $DIR
 
 # linuxdeploy
 wget -qc https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-$ARCH.AppImage
@@ -74,7 +73,7 @@ cd ../..
 
 # rpm package
 mkdir -p rpm/SOURCES/
-cp release/$DIR-binary.tar.gz rpm/SOURCES/$DIR.tar.gz
+cp release/$DIR.tar.gz rpm/SOURCES/
 if [ "$1" == "nightly" ]; then
     # Create a new spec file for nightly builds
     cp rpm/SPECS/nvtop.spec rpm/SPECS/nvtop-nightly.spec
