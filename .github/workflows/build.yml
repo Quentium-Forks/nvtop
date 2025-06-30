@@ -96,7 +96,15 @@ jobs:
 
   nightly-build:
     name: Build Nightly App
-    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, ubuntu-22.04-arm]
+        include:
+          - os: ubuntu-22.04
+            arch: "x86_64"
+          - os: ubuntu-22.04-arm
+            arch: "arm64"
+    runs-on: ${{ matrix.os }}
     if: ${{ github.event.inputs.nightly-build == 'true' }}
     steps:
       - name: Checkout
@@ -124,7 +132,7 @@ jobs:
       - name: Upload workflow artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: nvtop-nightly
+          name: nvtop-nightly-${{ matrix.arch }}
           path: |
             ${{ github.workspace }}/release/nvtop-nightly_*.deb
             ${{ github.workspace }}/release/nvtop-nightly-*.rpm
@@ -165,7 +173,7 @@ jobs:
 
       - name: Publish PPA package
         uses: yuezk/publish-ppa-package@main
-        if: github.event.inputs.publish == 'true'
+        if: github.event.inputs.publish == 'true' && matrix.arch == 'x86_64'
         with:
           tarball: ${{ github.workspace }}/release/nvtop-nightly-*.tar.gz
           debian_dir: ${{ github.workspace }}/debian/
