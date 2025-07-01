@@ -43,7 +43,7 @@ jobs:
 
       - name: Install libraries
         run: |
-          sudo apt install libncurses5-dev libncursesw5-dev libdrm-dev libsystemd-dev libudev-dev
+          sudo apt install libncurses-dev libdrm-dev libsystemd-dev libudev-dev
           sudo apt install libfuse2
 
       - name: Install build tools
@@ -118,7 +118,7 @@ jobs:
 
       - name: Install libraries
         run: |
-          sudo apt install libncurses5-dev libncursesw5-dev libdrm-dev libsystemd-dev libudev-dev
+          sudo apt install libncurses-dev libdrm-dev libsystemd-dev libudev-dev
           sudo apt install libfuse2
 
       - name: Install build tools
