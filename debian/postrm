@@ -1,5 +1,5 @@
 #!/bin/sh
 
-unlink /usr/bin/nvtop
+# unlink /usr/bin/nvtop
 
 exit 0 
