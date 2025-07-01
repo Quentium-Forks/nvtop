@@ -16,7 +16,6 @@ strip -s build/src/nvtop
 # assets
 mkdir -p release/$DIR/nvtop
 cp -r desktop debian release/$DIR
-cp -r build/src/* release/$DIR/nvtop
 cp desktop/nvtop.svg release/$DIR/nvtop
 cat desktop/nvtop.desktop > release/$DIR/nvtop/default.desktop
 
@@ -48,7 +47,12 @@ fi
 sed -i "s/^Architecture:\s\+.*$/Architecture: $ARCH_DPKG/g" release/$DIR/debian/control
 
 # tarball
+cp -r src CMakeLists.txt release/$DIR
 tar -czf release/$DIR.tar.gz -C release $DIR
+
+# Restablish for debian package
+rm -rf release/$DIR/src release/$DIR/CMakeLists.txt
+cp -r build/src/* release/$DIR/nvtop
 
 # linuxdeploy
 wget -qc https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-$ARCH.AppImage
