@@ -1,12 +1,10 @@
 .vscode/
 .idea/
-
 build/
 release/
-
 rpm/BUILDROOT/
 rpm/*RPMS/
 rpm/SOURCES/
 rpm/SPECS/*-nightly.spec
-
+cmake-build*/
 *.AppImage

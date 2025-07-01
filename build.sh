@@ -1,10 +1,8 @@
 #!/bin/bash
 
 rm -rf build
-mkdir build
-cd build
-cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=g++ ..
-make -j $(nproc)
-cd ..
+
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DNVIDIA_SUPPORT=ON -DAMDGPU_SUPPORT=ON
+cmake --build build -j $(nproc)
 
 ./build/src/nvtop
