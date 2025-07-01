@@ -129,14 +129,14 @@ jobs:
         run: |
           bash ${{ github.workspace }}/release.sh nightly
 
-      - name: Upload workflow artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: nvtop-nightly-${{ matrix.arch }}
-          path: |
-            ${{ github.workspace }}/release/nvtop-nightly_*.deb
-            ${{ github.workspace }}/release/nvtop-nightly-*.rpm
-            ${{ github.workspace }}/release/nvtop-nightly-*.AppImage
+      # - name: Upload workflow artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: nvtop-nightly-${{ matrix.arch }}
+      #     path: |
+      #       ${{ github.workspace }}/release/nvtop-nightly_*.deb
+      #       ${{ github.workspace }}/release/nvtop-nightly-*.rpm
+      #       ${{ github.workspace }}/release/nvtop-nightly-*.AppImage
 
       - name: Get commit count
         id: commit_count
