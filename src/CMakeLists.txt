@@ -152,7 +152,7 @@ target_include_directories(nvtop PRIVATE
   ${PROJECT_SOURCE_DIR}/include
   ${PROJECT_BINARY_DIR}/include)
 
-find_package(Sanitizers)
+find_package(Sanitizers QUIET)
 
 add_sanitizers(nvtop)
 
