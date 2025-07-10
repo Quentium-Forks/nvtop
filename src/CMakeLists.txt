@@ -79,14 +79,14 @@ endif()
 
 if(AMDGPU_SUPPORT OR INTEL_SUPPORT OR MSM_SUPPORT OR PANFROST_SUPPORT OR PANTHOR_SUPPORT)
   # Search for libdrm for AMDGPU support
-  find_package(Libdrm)
+  pkg_check_modules(LIBDRM REQUIRED libdrm)
 
-  if(Libdrm_FOUND)
+  if(LIBDRM_FOUND)
     message(STATUS "Found libdrm; Enabling support")
-    target_include_directories(nvtop PRIVATE ${Libdrm_INCLUDE_DIRS})
+    target_include_directories(nvtop PRIVATE ${LIBDRM_INCLUDE_DIRS})
+    target_link_libraries(nvtop PRIVATE ${LIBDRM_LIBRARIES})
   else()
     message(FATAL_ERROR "libdrm not found; This library is required for AMDGPU, INTEL, MSM, PANFROST and PANTHOR support")
-    # CMake will exit if libdrm is not found
   endif()
 endif()
 
