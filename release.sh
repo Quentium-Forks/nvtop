@@ -10,7 +10,7 @@ rm -rf release build rpm/BUILDROOT rpm/*RPMS rpm/SOURCES
 
 # Prepare source for tarball
 mkdir -p release/$DIR
-cp -r src CMakeLists.txt desktop debian release/$DIR
+cp -r src include CMakeLists.txt desktop debian release/$DIR
 cp desktop/nvtop.svg release/$DIR/desktop/
 cat desktop/nvtop.desktop > release/$DIR/desktop/default.desktop
 
