@@ -1,5 +1,5 @@
 #!/bin/sh
 
-# ln -sf "/usr/share/nvtop/nvtop" "/usr/bin/nvtop"
+ln -sf "/usr/share/nvtop/nvtop" "/usr/bin/nvtop"
 
 exit 0
