@@ -6,6 +6,3 @@
 
 %:
 	dh $@ --parallel
-
-override_dh_strip:
-# Do nothing
