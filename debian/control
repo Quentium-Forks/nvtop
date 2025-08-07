@@ -10,7 +10,7 @@ Vcs-Git: https://github.com/Quentium-Forks/nvtop.git
 Homepage: https://github.com/Quentium-Forks/nvtop
 
 Package: nvtop
-Architecture: amd64
+Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, libc6 (>= 2.34), libncurses6 (>= 6), libncursesw6 (>= 6), libsystemd0 (>= 240), libtinfo6 (>= 6)
 Recommends: systemd
 Description: NVTOP stands for Neat Videocard TOP, a (h)top like task monitor for GPUs and accelerators. It can handle multiple GPUs and print information about them in a htop-familiar way.
