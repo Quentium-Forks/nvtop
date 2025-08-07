@@ -101,9 +101,9 @@ jobs:
         os: [ubuntu-22.04, ubuntu-22.04-arm]
         include:
           - os: ubuntu-22.04
-            arch: "x86_64"
+            codename: "jammy"
           - os: ubuntu-22.04-arm
-            arch: "arm64"
+            codename: "jammy-arm"
     runs-on: ${{ matrix.os }}
     if: ${{ github.event.inputs.nightly-build == 'true' }}
     steps:
@@ -132,7 +132,7 @@ jobs:
       - name: Upload workflow artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: nvtop-nightly-${{ matrix.arch }}
+          name: nvtop-nightly-${{ matrix.codename }}
           path: |
             ${{ github.workspace }}/release/nvtop-nightly_*.deb
             ${{ github.workspace }}/release/nvtop-nightly-*.rpm
@@ -173,7 +173,7 @@ jobs:
 
       - name: Publish PPA package
         uses: yuezk/publish-ppa-package@main
-        if: github.event.inputs.publish == 'true' && matrix.arch == 'x86_64'
+        if: github.event.inputs.publish == 'true' && matrix.codename == 'jammy'
         with:
           tarball: ${{ github.workspace }}/release/nvtop-nightly-*.tar.gz
           debian_dir: ${{ github.workspace }}/debian/
