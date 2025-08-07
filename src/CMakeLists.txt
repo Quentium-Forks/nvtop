@@ -34,9 +34,8 @@ if(HAS_REALLOCARRAY)
   target_compile_definitions(nvtop PRIVATE HAS_REALLOCARRAY)
 endif()
 
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(UDEV REQUIRED udev)
-pkg_check_modules(SYSTEMD REQUIRED libsystemd)
+find_package(UDev)
+find_package(Systemd)
 option(USE_LIBUDEV_OVER_LIBSYSTEMD "Use libudev, even if libsystemd is present" OFF)
 
 if(UNIX AND NOT APPLE)
@@ -63,13 +62,11 @@ endif()
 
 if(AMDGPU_SUPPORT OR INTEL_SUPPORT OR V3D_SUPPORT)
   if((SYSTEMD_FOUND AND UDEV_FOUND AND USE_LIBUDEV_OVER_LIBSYSTEMD) OR(NOT SYSTEMD_FOUND AND UDEV_FOUND))
-    target_include_directories(nvtop PRIVATE ${UDEV_INCLUDE_DIRS})
     target_compile_definitions(nvtop PRIVATE USING_LIBUDEV)
-    target_link_libraries(nvtop PRIVATE ${UDEV_LIBRARIES})
+    target_link_libraries(nvtop PRIVATE udev)
   elseif(SYSTEMD_FOUND)
-    target_include_directories(nvtop PRIVATE ${SYSTEMD_INCLUDE_DIRS})
     target_compile_definitions(nvtop PRIVATE USING_LIBSYSTEMD)
-    target_link_libraries(nvtop PRIVATE ${SYSTEMD_LIBRARIES})
+    target_link_libraries(nvtop PRIVATE systemd)
   else()
     message(FATAL_ERROR "Neither libsystemd nor libudev were found; These are required for AMDGPU, INTEL and V3D support")
   endif()
@@ -79,14 +76,14 @@ endif()
 
 if(AMDGPU_SUPPORT OR INTEL_SUPPORT OR MSM_SUPPORT OR PANFROST_SUPPORT OR PANTHOR_SUPPORT)
   # Search for libdrm for AMDGPU support
-  pkg_check_modules(LIBDRM REQUIRED libdrm)
+  find_package(Libdrm)
 
-  if(LIBDRM_FOUND)
+  if(Libdrm_FOUND)
     message(STATUS "Found libdrm; Enabling support")
-    target_include_directories(nvtop PRIVATE ${LIBDRM_INCLUDE_DIRS})
-    target_link_libraries(nvtop PRIVATE ${LIBDRM_LIBRARIES})
+    target_include_directories(nvtop PRIVATE ${Libdrm_INCLUDE_DIRS})
   else()
     message(FATAL_ERROR "libdrm not found; This library is required for AMDGPU, INTEL, MSM, PANFROST and PANTHOR support")
+    # CMake will exit if libdrm is not found
   endif()
 endif()
 
@@ -152,7 +149,7 @@ target_include_directories(nvtop PRIVATE
   ${PROJECT_SOURCE_DIR}/include
   ${PROJECT_BINARY_DIR}/include)
 
-find_package(Sanitizers QUIET)
+find_package(Sanitizers)
 
 add_sanitizers(nvtop)
 
