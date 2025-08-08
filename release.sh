@@ -14,10 +14,8 @@ cmake --build build -j $(nproc)
 strip -s build/src/nvtop
 
 # assets
-mkdir -p release/$DIR/nvtop
+mkdir -p release/$DIR
 cp -r src include cmake CMakeLists.txt debian desktop manpage tests release/$DIR
-cp desktop/nvtop.svg release/$DIR/nvtop
-cat desktop/nvtop.desktop > release/$DIR/nvtop/default.desktop
 
 if [ "$1" == "nightly" ]; then
     # Number of commits since last tag
@@ -54,9 +52,9 @@ wget -qc https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous
 chmod +x linuxdeploy-$ARCH.AppImage
 
 # appimage
-cmake -S . -B build -DNVIDIA_SUPPORT=ON -DAMDGPU_SUPPORT=ON -DCMAKE_INSTALL_PREFIX=/usr
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DNVIDIA_SUPPORT=ON -DAMDGPU_SUPPORT=ON -DCMAKE_INSTALL_PREFIX=/usr
 DESTDIR=../release/$DIR cmake --build build --target install
-./linuxdeploy-$ARCH.AppImage --appdir release/$DIR -i release/$DIR/nvtop/nvtop.svg -d release/$DIR/desktop/nvtop.desktop --output appimage
+./linuxdeploy-$ARCH.AppImage --appdir release/$DIR -i release/$DIR/desktop/nvtop.svg -d release/$DIR/desktop/nvtop.desktop --output appimage
 if [ "$1" == "nightly" ]; then
     mv nvtop-$VERSION-$ARCH.AppImage release/nvtop-nightly-$VERSION-$ARCH.AppImage
 else
@@ -72,8 +70,8 @@ debuild --no-lintian -us -uc
 cd ../..
 
 # rpm package
-mkdir -p rpm/SOURCES/
-cp release/$DIR.tar.gz rpm/SOURCES/
+mkdir -p rpm/SOURCES
+cp release/$DIR.tar.gz rpm/SOURCES
 if [ "$1" == "nightly" ]; then
     # Create a new spec file for nightly builds
     cp rpm/SPECS/nvtop.spec rpm/SPECS/nvtop-nightly.spec
