@@ -48,7 +48,7 @@ jobs:
 
       - name: Install build tools
         run: |
-          sudo apt install -y dh-make devscripts build-essential lintian
+          sudo apt install -y cmake dh-make devscripts build-essential lintian
 
       - name: Build and make release
         run: |
@@ -122,7 +122,7 @@ jobs:
 
       - name: Install build tools
         run: |
-          sudo apt install -y dh-make devscripts build-essential lintian
+          sudo apt install -y cmake dh-make devscripts build-essential lintian
 
       - name: Build and make nightly release
         run: |
