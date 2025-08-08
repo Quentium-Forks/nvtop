@@ -38,17 +38,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Update apt repositories
-        run: sudo apt update
+      - name: Update package repositories
+        run: sudo apt-get update
 
       - name: Install libraries
         run: |
-          sudo apt install libncurses-dev libdrm-dev libsystemd-dev libudev-dev
-          sudo apt install libfuse2
+          sudo apt-get install libncurses-dev libdrm-dev libsystemd-dev libudev-dev
+          sudo apt-get install libfuse2
 
       - name: Install build tools
         run: |
-          sudo apt install -y cmake dh-make devscripts build-essential lintian
+          sudo apt-get install -y cmake dh-make devscripts build-essential lintian
 
       - name: Build and make release
         run: |
@@ -112,17 +112,17 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
-      - name: Update apt repositories
-        run: sudo apt update
+      - name: Update package repositories
+        run: sudo apt-get update
 
       - name: Install libraries
         run: |
-          sudo apt install libncurses-dev libdrm-dev libsystemd-dev libudev-dev
-          sudo apt install libfuse2
+          sudo apt-get install libncurses-dev libdrm-dev libsystemd-dev libudev-dev
+          sudo apt-get install libfuse2
 
       - name: Install build tools
         run: |
-          sudo apt install -y cmake dh-make devscripts build-essential lintian
+          sudo apt-get install -y cmake dh-make devscripts build-essential lintian
 
       - name: Build and make nightly release
         run: |
