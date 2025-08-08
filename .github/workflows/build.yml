@@ -64,12 +64,10 @@ jobs:
             ${{ github.workspace }}/release/nvtop-*.AppImage
 
       - name: Update debian files
-        if: github.event_name != 'workflow_dispatch' && matrix.codename == 'jammy'
         run: |
           sed -i "s/^Architecture:\s\+.*$/Architecture: any/g" ${{ github.workspace }}/debian/control
 
       - name: Display debian folder
-        if: github.event_name != 'workflow_dispatch' && matrix.codename == 'jammy'
         run: |
           echo "Debian folder content:"
           ls -la ${{ github.workspace }}/debian/
@@ -141,7 +139,6 @@ jobs:
 
       - name: Get commit count
         id: commit_count
-        if: github.event.inputs.publish == 'true' && matrix.codename == 'jammy'
         run: |
           LAST_TAG=$(git describe --tags --abbrev=0 || echo "HEAD")
           COMMITS=$(git rev-list --count $LAST_TAG..HEAD)
@@ -149,7 +146,6 @@ jobs:
           echo "commit_count=$COMMITS" >> $GITHUB_ENV
 
       - name: Update debian files
-        if: github.event.inputs.publish == 'true' && matrix.codename == 'jammy'
         run: |
           sed -i "s/${{ env.last_tag }}-/${{ env.last_tag }}+${{ env.commit_count }}-/g" ${{ github.workspace }}/debian/changelog
           sed -i "s/^nvtop/nvtop-nightly/g" ${{ github.workspace }}/debian/changelog
@@ -162,7 +158,6 @@ jobs:
           echo "revision=$REVISION" >> $GITHUB_ENV
 
       - name: Display debian folder
-        if: github.event.inputs.publish == 'true' && matrix.codename == 'jammy'
         run: |
           echo "Debian folder content:"
           ls -la ${{ github.workspace }}/debian/
