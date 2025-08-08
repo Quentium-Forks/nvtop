@@ -86,7 +86,7 @@ if [ "$1" == "nightly" ]; then
     mv rpm/RPMS/$ARCH/nvtop-nightly-$VERSION-1.$ARCH.rpm release/nvtop-nightly-$VERSION.$ARCH.rpm
 else
     # Change architecture
-    sed -i "s/^BuildArch:\s\+.*$/BuildArch: $ARCH/g" rpm/SPECS/nvtop.spec
+    sed -i "s/^BuildArch:\s\+.*$/BuildArch:      $ARCH/g" rpm/SPECS/nvtop.spec
 
     rpmbuild -bb --build-in-place --define "_topdir $(pwd)/rpm" rpm/SPECS/nvtop.spec
     mv rpm/RPMS/$ARCH/nvtop-$VERSION-1.$ARCH.rpm release/nvtop-$VERSION.$ARCH.rpm
