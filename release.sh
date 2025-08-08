@@ -47,12 +47,7 @@ fi
 sed -i "s/^Architecture:\s\+.*$/Architecture: $ARCH_DPKG/g" release/$DIR/debian/control
 
 # tarball
-cp -r src CMakeLists.txt release/$DIR
 tar -czf release/$DIR.tar.gz -C release $DIR
-
-# Restablish for debian package
-rm -rf release/$DIR/src release/$DIR/CMakeLists.txt
-cp -r build/src/* release/$DIR/nvtop
 
 # linuxdeploy
 wget -qc https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-$ARCH.AppImage
