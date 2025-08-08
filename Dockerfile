@@ -11,7 +11,7 @@ FROM ${IMAGE} as builder
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
-  apt-get install -yq build-essential wget libncurses5-dev libncursesw5-dev libssl-dev \
+  apt-get install -yq build-essential wget libncurses-dev libssl-dev \
   pkg-config libdrm-dev libgtest-dev libudev-dev python3-venv
 
 # Get a recent-enough CMake
@@ -31,7 +31,7 @@ RUN mkdir -p /nvtop/build && \
 
 # Stage 2
 FROM ${IMAGE}
-RUN DEBIAN_FRONTEND=noninteractive apt-get update -y && apt-get install -yq libncurses5 libncursesw5 libdrm-amdgpu1 \
+RUN DEBIAN_FRONTEND=noninteractive apt-get update -y && apt-get install -yq libncurses6 libncursesw6 libdrm-amdgpu1 \
   && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /usr/local/bin/nvtop /usr/local/bin/nvtop
 COPY --from=builder /usr/local/share/man/man1/nvtop.1 /usr/local/share/man/man1/nvtop.1
