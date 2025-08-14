@@ -123,7 +123,7 @@ jobs:
 
       - name: Install build tools
         run: |
-          apt-get install -y cmake dh-make devscripts build-essential lintian
+          DEBIAN_FRONTEND=noninteractive apt-get install -y cmake dh-make devscripts build-essential lintian
 
       - name: Build and make nightly release
         run: |
