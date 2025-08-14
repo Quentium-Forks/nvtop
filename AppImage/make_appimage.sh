@@ -6,7 +6,7 @@ APPIMAGETOOL="https://github.com/AppImage/appimagetool/releases/download/continu
 
 install_deps() {
 	apt-get update
-	apt-get install -y gcc g++ cmake libncurses5-dev libncursesw5-dev libdrm-dev \
+	apt-get install -y gcc g++ cmake libncurses-dev libdrm-dev \
 	  wget file libudev-dev ninja-build cmake file desktop-file-utils
 }
 

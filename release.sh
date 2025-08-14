@@ -1,6 +1,8 @@
 #!/bin/bash
-VERSION=3.2.0.1
+VERSION=3.2.0.2
 DIR=nvtop-$VERSION
+ARCH=$(uname -m)
+ARCH_DPKG=$(dpkg --print-architecture)
 export VERSION=$VERSION
 
 # cleanup
@@ -12,11 +14,8 @@ cmake --build build -j $(nproc)
 strip -s build/src/nvtop
 
 # assets
-mkdir -p release/$DIR/nvtop
-cp -r desktop debian release/$DIR
-cp -r build/src/* release/$DIR/nvtop
-cp desktop/nvtop.svg release/$DIR/nvtop
-cat desktop/nvtop.desktop > release/$DIR/nvtop/default.desktop
+mkdir -p release/$DIR
+cp -r src include cmake CMakeLists.txt debian desktop manpage tests release/$DIR
 
 if [ "$1" == "nightly" ]; then
     # Number of commits since last tag
@@ -32,9 +31,9 @@ if [ "$1" == "nightly" ]; then
     sed -i "s/ nvtop$/ nvtop-nightly/g" release/$DIR/debian/control
 
     # Prevent conflict with nvtop
-    sed -i "s/Architecture: all/Architecture: all\nProvides: nvtop/g" release/$DIR/debian/control
-    sed -i "s/Architecture: all/Architecture: all\nConflicts: nvtop/g" release/$DIR/debian/control
-    sed -i "s/Architecture: all/Architecture: all\nReplaces: nvtop/g" release/$DIR/debian/control
+    sed -i "s/Recommends: systemd/Provides: nvtop\nRecommends: systemd/g" release/$DIR/debian/control
+    sed -i "s/Recommends: systemd/Conflicts: nvtop\nRecommends: systemd/g" release/$DIR/debian/control
+    sed -i "s/Recommends: systemd/Replaces: nvtop\nRecommends: systemd/g" release/$DIR/debian/control
 
     VERSION="$VERSION+$COMMITS"
     export VERSION=$VERSION
@@ -42,24 +41,27 @@ if [ "$1" == "nightly" ]; then
     DIR=nvtop-nightly-$VERSION
 fi
 
+# Change architecture
+sed -i "s/^Architecture:\s\+.*$/Architecture: $ARCH_DPKG/g" release/$DIR/debian/control
+
 # tarball
 tar -czf release/$DIR.tar.gz -C release $DIR
 
 # linuxdeploy
-wget -qc https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
-chmod +x linuxdeploy-x86_64.AppImage
+wget -qc https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-$ARCH.AppImage
+chmod +x linuxdeploy-$ARCH.AppImage
 
 # appimage
-cmake -S . -B build -DNVIDIA_SUPPORT=ON -DAMDGPU_SUPPORT=ON -DCMAKE_INSTALL_PREFIX=/usr
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DNVIDIA_SUPPORT=ON -DAMDGPU_SUPPORT=ON -DCMAKE_INSTALL_PREFIX=/usr
 DESTDIR=../release/$DIR cmake --build build --target install
-./linuxdeploy-x86_64.AppImage --appdir release/$DIR -i release/$DIR/nvtop/nvtop.svg -d release/$DIR/desktop/nvtop.desktop --output appimage
+./linuxdeploy-$ARCH.AppImage --appdir release/$DIR -i release/$DIR/desktop/nvtop.svg -d release/$DIR/desktop/nvtop.desktop --output appimage
 if [ "$1" == "nightly" ]; then
-    mv nvtop-$VERSION-x86_64.AppImage release/nvtop-nightly-$VERSION-x86_64.AppImage
+    mv nvtop-$VERSION-$ARCH.AppImage release/nvtop-nightly-$VERSION-$ARCH.AppImage
 else
-    mv nvtop-$VERSION-x86_64.AppImage release
+    mv nvtop-$VERSION-$ARCH.AppImage release
 fi
 
-rm linuxdeploy-x86_64.AppImage
+rm linuxdeploy-$ARCH.AppImage
 
 # debian package
 cd release/$DIR
@@ -68,15 +70,24 @@ debuild --no-lintian -us -uc
 cd ../..
 
 # rpm package
-mkdir -p rpm/SOURCES/
-cp release/$DIR.tar.gz rpm/SOURCES/
+mkdir -p rpm/SOURCES
+cp release/$DIR.tar.gz rpm/SOURCES
 if [ "$1" == "nightly" ]; then
+    # Create a new spec file for nightly builds
     cp rpm/SPECS/nvtop.spec rpm/SPECS/nvtop-nightly.spec
+    # Change package name
     sed -i "s/^Name:\s\+nvtop$/Name: nvtop-nightly/g" rpm/SPECS/nvtop-nightly.spec
+    # Increase version number
     sed -i "s/^Version:\s\+.*$/Version: $VERSION/g" rpm/SPECS/nvtop-nightly.spec
+    # Change architecture
+    sed -i "s/^BuildArch:\s\+.*$/BuildArch: $ARCH/g" rpm/SPECS/nvtop-nightly.spec
+
     rpmbuild -bb --build-in-place --define "_topdir $(pwd)/rpm" rpm/SPECS/nvtop-nightly.spec
-    mv rpm/RPMS/x86_64/nvtop-nightly-$VERSION-1.x86_64.rpm release/nvtop-nightly-$VERSION.x86_64.rpm
+    mv rpm/RPMS/$ARCH/nvtop-nightly-$VERSION-1.$ARCH.rpm release/nvtop-nightly-$VERSION.$ARCH.rpm
 else
+    # Change architecture
+    sed -i "s/^BuildArch:\s\+.*$/BuildArch:      $ARCH/g" rpm/SPECS/nvtop.spec
+
     rpmbuild -bb --build-in-place --define "_topdir $(pwd)/rpm" rpm/SPECS/nvtop.spec
-    mv rpm/RPMS/x86_64/nvtop-$VERSION-1.x86_64.rpm release/nvtop-$VERSION.x86_64.rpm
+    mv rpm/RPMS/$ARCH/nvtop-$VERSION-1.$ARCH.rpm release/nvtop-$VERSION.$ARCH.rpm
 fi

@@ -33,7 +33,7 @@ apps:
 parts:
   libdrm:
     source: https://gitlab.freedesktop.org/mesa/drm.git
-    source-tag: libdrm-2.4.113
+    source-tag: libdrm-2.4.125
     plugin: meson
     meson-parameters:
     - --prefix=/usr

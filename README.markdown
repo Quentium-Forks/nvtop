@@ -188,7 +188,7 @@ sudo apt install nvtop
 - NVTOP Dependencies
  - CMake, ncurses and Git
   ```bash
-  sudo apt install cmake libncurses5-dev libncursesw5-dev git
+  sudo apt install cmake libncurses-dev git
   ```
 
 - NVTOP

@@ -1,5 +1,5 @@
 Name:           nvtop
-Version:        3.2.0.1
+Version:        3.2.0.2
 Release:        1%{?dist}
 Summary:        GPU & Accelerator process monitoring for AMD, Apple, Huawei, Intel, NVIDIA and Qualcomm
 
@@ -17,29 +17,30 @@ NVTOP stands for Neat Videocard TOP, a (h)top like task monitor for GPUs and acc
 %setup -q
 
 %build
-echo "No build step defined"
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DNVIDIA_SUPPORT=ON -DAMDGPU_SUPPORT=ON
+cmake --build build -j $(nproc)
 
 %install
 rm -rf %{buildroot}
 
 # Install binary
-install -Dm755 %{_builddir}/release/%{name}-%{version}/nvtop/nvtop %{buildroot}/usr/bin/nvtop
+install -Dm755 build/src/nvtop %{buildroot}/usr/bin/nvtop
 
 # Install .desktop file
-install -Dm644 %{_builddir}/release/%{name}-%{version}/desktop/nvtop.desktop %{buildroot}/usr/share/applications/nvtop.desktop
+install -Dm644 desktop/nvtop.desktop %{buildroot}/usr/share/applications/nvtop.desktop
 
 # Install svg icon
-install -Dm644 %{_builddir}/release/%{name}-%{version}/desktop/nvtop.svg %{buildroot}/usr/share/icons/hicolor/scalable/apps/nvtop.png
+install -Dm644 desktop/nvtop.svg %{buildroot}/usr/share/icons/hicolor/scalable/apps/nvtop.svg
 
 # Install README doc
-install -Dm644 %{_builddir}/README.markdown %{buildroot}/usr/share/doc/nvtop/README.md
+install -Dm644 README.markdown %{buildroot}/usr/share/doc/nvtop/README.md
 
 %files
 %license
 %doc
 /usr/bin/nvtop
 /usr/share/applications/nvtop.desktop
-/usr/share/icons/hicolor/scalable/apps/nvtop.png
+/usr/share/icons/hicolor/scalable/apps/nvtop.svg
 /usr/share/doc/nvtop/README.md
 
 %changelog
