@@ -104,6 +104,7 @@ jobs:
           - os: ubuntu-22.04-arm
             codename: "jammy-arm"
     runs-on: ${{ matrix.os }}
+    container: ubuntu:20.04
     if: ${{ github.event.inputs.nightly-build == 'true' }}
     steps:
       - name: Checkout
@@ -155,7 +156,7 @@ jobs:
           sed -i "s/Recommends: systemd/Replaces: nvtop\nRecommends: systemd/g" ${{ github.workspace }}/debian/control
           sed -i "s/^Architecture:\s\+.*$/Architecture: any/g" ${{ github.workspace }}/debian/control
           REVISION=$(grep -oP '\-\d+' debian/changelog | head -n 1 | cut -d '-' -f 2)
-          echo "revision=$REVISION" >> $GITHUB_ENV
+          echo "revision=0" >> $GITHUB_ENV
 
       - name: Display debian folder
         run: |
