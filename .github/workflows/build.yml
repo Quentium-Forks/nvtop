@@ -113,8 +113,10 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
-      - name: List all files in workspace
-        run: ls -la /__w/nvtop/nvtop
+      - name: Setup CMake 3.18
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: 3.18
 
       - name: Update package repositories
         run: apt-get update
