@@ -1,3 +1,13 @@
+nvtop (3.2.0.2-1) stable; urgency=medium
+
+  * Add arm64 builds with GitHub Actions (deb, rpm and AppImage)
+  * Add arm64, armhf, i386, powerpc, ppc64el, riscv64, s390x builds to PPA
+  * Fix build no longer included in PPA publishing (rely on CMake to install bin and assets)
+  * Build type as release & use CMake instead of make
+  * Bump versions to oldest supported in workflows
+
+ -- Quentin Lienhardt <pro@quentium.fr>  Tue, 14 Aug 2025 18:00:00 +0100
+
 nvtop (3.2.0.1-1) stable; urgency=medium
 
   * Build and publish with jammy dependencies (oldest supported)
