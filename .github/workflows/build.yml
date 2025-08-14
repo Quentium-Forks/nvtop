@@ -52,38 +52,38 @@ jobs:
 
       - name: Build and make release
         run: |
-          bash ${{ github.workspace }}/release.sh
+          bash /__w/nvtop/nvtop/release.sh
 
       - name: Upload workflow artifacts
         uses: actions/upload-artifact@v4
         with:
           name: nvtop-${{ matrix.codename }}
           path: |
-            ${{ github.workspace }}/release/nvtop_*.deb
-            ${{ github.workspace }}/release/nvtop-*.rpm
-            ${{ github.workspace }}/release/nvtop-*.AppImage
+            /__w/nvtop/nvtop/release/nvtop_*.deb
+            /__w/nvtop/nvtop/release/nvtop-*.rpm
+            /__w/nvtop/nvtop/release/nvtop-*.AppImage
 
       - name: Update debian files
         run: |
-          sed -i "s/^Architecture:\s\+.*$/Architecture: any/g" ${{ github.workspace }}/debian/control
+          sed -i "s/^Architecture:\s\+.*$/Architecture: any/g" /__w/nvtop/nvtop/debian/control
 
       - name: Display debian folder
         run: |
           echo "Debian folder content:"
-          ls -la ${{ github.workspace }}/debian/
+          ls -la /__w/nvtop/nvtop/debian/
           echo "Release folder content:"
-          ls -la ${{ github.workspace }}/release/
+          ls -la /__w/nvtop/nvtop/release/
           echo "Control file content:"
-          cat ${{ github.workspace }}/debian/control
+          cat /__w/nvtop/nvtop/debian/control
           echo "Changelog file content:"
-          cat ${{ github.workspace }}/debian/changelog
+          cat /__w/nvtop/nvtop/debian/changelog
 
       - name: Publish PPA package
         uses: yuezk/publish-ppa-package@main
         if: github.event_name != 'workflow_dispatch' && matrix.codename == 'jammy'
         with:
-          tarball: ${{ github.workspace }}/release/nvtop-*.tar.gz
-          debian_dir: ${{ github.workspace }}/debian/
+          tarball: /__w/nvtop/nvtop/release/nvtop-*.tar.gz
+          debian_dir: /__w/nvtop/nvtop/debian/
           repository: "quentiumyt/nvtop"
           deb_email: "pro@quentium.fr"
           deb_fullname: "Quentin Lienhardt"
@@ -113,11 +113,8 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
-      - name: Change github.workspace to /__w/nvtop/nvtop
-        run: echo "GITHUB_WORKSPACE=/__w/nvtop/nvtop" >> $GITHUB_ENV
-
       - name: List all files in workspace
-        run: ls -la ${{ github.workspace }}
+        run: ls -la /__w/nvtop/nvtop
 
       - name: Update package repositories
         run: apt-get update
@@ -133,16 +130,16 @@ jobs:
 
       - name: Build and make nightly release
         run: |
-          bash ${{ github.workspace }}/release.sh nightly
+          bash /__w/nvtop/nvtop/release.sh nightly
 
       - name: Upload workflow artifacts
         uses: actions/upload-artifact@v4
         with:
           name: nvtop-nightly-${{ matrix.codename }}
           path: |
-            ${{ github.workspace }}/release/nvtop-nightly_*.deb
-            ${{ github.workspace }}/release/nvtop-nightly-*.rpm
-            ${{ github.workspace }}/release/nvtop-nightly-*.AppImage
+            /__w/nvtop/nvtop/release/nvtop-nightly_*.deb
+            /__w/nvtop/nvtop/release/nvtop-nightly-*.rpm
+            /__w/nvtop/nvtop/release/nvtop-nightly-*.AppImage
 
       - name: Get commit count
         id: commit_count
@@ -154,33 +151,33 @@ jobs:
 
       - name: Update debian files
         run: |
-          sed -i "s/${{ env.last_tag }}-/${{ env.last_tag }}+${{ env.commit_count }}-/g" ${{ github.workspace }}/debian/changelog
-          sed -i "s/^nvtop/nvtop-nightly/g" ${{ github.workspace }}/debian/changelog
-          sed -i "s/ nvtop$/ nvtop-nightly/g" ${{ github.workspace }}/debian/control
-          sed -i "s/Recommends: systemd/Provides: nvtop\nRecommends: systemd/g" ${{ github.workspace }}/debian/control
-          sed -i "s/Recommends: systemd/Conflicts: nvtop\nRecommends: systemd/g" ${{ github.workspace }}/debian/control
-          sed -i "s/Recommends: systemd/Replaces: nvtop\nRecommends: systemd/g" ${{ github.workspace }}/debian/control
-          sed -i "s/^Architecture:\s\+.*$/Architecture: any/g" ${{ github.workspace }}/debian/control
+          sed -i "s/${{ env.last_tag }}-/${{ env.last_tag }}+${{ env.commit_count }}-/g" /__w/nvtop/nvtop/debian/changelog
+          sed -i "s/^nvtop/nvtop-nightly/g" /__w/nvtop/nvtop/debian/changelog
+          sed -i "s/ nvtop$/ nvtop-nightly/g" /__w/nvtop/nvtop/debian/control
+          sed -i "s/Recommends: systemd/Provides: nvtop\nRecommends: systemd/g" /__w/nvtop/nvtop/debian/control
+          sed -i "s/Recommends: systemd/Conflicts: nvtop\nRecommends: systemd/g" /__w/nvtop/nvtop/debian/control
+          sed -i "s/Recommends: systemd/Replaces: nvtop\nRecommends: systemd/g" /__w/nvtop/nvtop/debian/control
+          sed -i "s/^Architecture:\s\+.*$/Architecture: any/g" /__w/nvtop/nvtop/debian/control
           REVISION=$(grep -oP '\-\d+' debian/changelog | head -n 1 | cut -d '-' -f 2)
           echo "revision=0" >> $GITHUB_ENV
 
       - name: Display debian folder
         run: |
           echo "Debian folder content:"
-          ls -la ${{ github.workspace }}/debian/
+          ls -la /__w/nvtop/nvtop/debian/
           echo "Release folder content:"
-          ls -la ${{ github.workspace }}/release/
+          ls -la /__w/nvtop/nvtop/release/
           echo "Control file content:"
-          cat ${{ github.workspace }}/debian/control
+          cat /__w/nvtop/nvtop/debian/control
           echo "Changelog file content:"
-          cat ${{ github.workspace }}/debian/changelog
+          cat /__w/nvtop/nvtop/debian/changelog
 
       - name: Publish PPA package
         uses: yuezk/publish-ppa-package@main
         if: github.event.inputs.publish == 'true' && matrix.codename == 'jammy'
         with:
-          tarball: ${{ github.workspace }}/release/nvtop-nightly-*.tar.gz
-          debian_dir: ${{ github.workspace }}/debian/
+          tarball: /__w/nvtop/nvtop/release/nvtop-nightly-*.tar.gz
+          debian_dir: /__w/nvtop/nvtop/debian/
           repository: "quentiumyt/nvtop"
           deb_email: "pro@quentium.fr"
           deb_fullname: "Quentin Lienhardt"
