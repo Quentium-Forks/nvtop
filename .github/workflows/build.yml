@@ -128,7 +128,7 @@ jobs:
 
       - name: Install build tools
         run: |
-          DEBIAN_FRONTEND=noninteractive apt-get install -y cmake dh-make devscripts build-essential lintian
+          DEBIAN_FRONTEND=noninteractive apt-get install -y cmake dh-make devscripts build-essential lintian wget rpm
 
       - name: Build and make nightly release
         run: |
@@ -147,7 +147,7 @@ jobs:
         id: commit_count
         run: |
           LAST_TAG=$(git describe --tags --abbrev=0 || echo "HEAD")
-          COMMITS=$(git rev-list --count $LAST_TAG..HEAD)
+          COMMITS=0
           echo "last_tag=$LAST_TAG" >> $GITHUB_ENV
           echo "commit_count=$COMMITS" >> $GITHUB_ENV
 
@@ -161,7 +161,7 @@ jobs:
           sed -i "s/Recommends: systemd/Replaces: nvtop\nRecommends: systemd/g" /__w/nvtop/nvtop/debian/control
           sed -i "s/^Architecture:\s\+.*$/Architecture: any/g" /__w/nvtop/nvtop/debian/control
           REVISION=$(grep -oP '\-\d+' debian/changelog | head -n 1 | cut -d '-' -f 2)
-          echo "revision=0" >> $GITHUB_ENV
+          echo "revision=1" >> $GITHUB_ENV
 
       - name: Display debian folder
         run: |
