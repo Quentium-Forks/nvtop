@@ -114,16 +114,16 @@ jobs:
           fetch-tags: true
 
       - name: Update package repositories
-        run: sudo apt-get update
+        run: apt-get update
 
       - name: Install libraries
         run: |
-          sudo apt-get install libncurses-dev libdrm-dev libsystemd-dev libudev-dev
-          sudo apt-get install libfuse2
+          apt-get install libncurses-dev libdrm-dev libsystemd-dev libudev-dev
+          apt-get install libfuse2
 
       - name: Install build tools
         run: |
-          sudo apt-get install -y cmake dh-make devscripts build-essential lintian
+          apt-get install -y cmake dh-make devscripts build-essential lintian
 
       - name: Build and make nightly release
         run: |
