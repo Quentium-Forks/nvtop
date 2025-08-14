@@ -118,8 +118,8 @@ jobs:
 
       - name: Install libraries
         run: |
-          apt-get install libncurses-dev libdrm-dev libsystemd-dev libudev-dev
-          apt-get install libfuse2
+          apt-get install -y libncurses-dev libdrm-dev libsystemd-dev libudev-dev
+          apt-get install -y libfuse2
 
       - name: Install build tools
         run: |
