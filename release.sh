@@ -62,8 +62,12 @@ tar -czf release/$DIR.tar.gz -C release $DIR
 
 # rm linuxdeploy-$ARCH.AppImage
 
+ls -al
+
 # debian package
 cd release/$DIR
+ls -al
+cat debian/changelog
 dh_make --createorig --indep --yes
 debuild --no-lintian -us -uc
 cd ../..
