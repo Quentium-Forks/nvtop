@@ -19,8 +19,7 @@ cp -r src include cmake CMakeLists.txt debian desktop manpage tests release/$DIR
 
 if [ "$1" == "nightly" ]; then
     # Number of commits since last tag
-    LAST_TAG=$(git describe --tags --abbrev=0 || echo "HEAD")
-    COMMITS=$(git rev-list --count $LAST_TAG..HEAD)
+    COMMITS=0
     echo "Build number: $COMMITS"
 
     # Increase version number
@@ -47,21 +46,21 @@ sed -i "s/^Architecture:\s\+.*$/Architecture: $ARCH_DPKG/g" release/$DIR/debian/
 # tarball
 tar -czf release/$DIR.tar.gz -C release $DIR
 
-# linuxdeploy
-wget -qc https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-$ARCH.AppImage
-chmod +x linuxdeploy-$ARCH.AppImage
+# # linuxdeploy
+# wget -qc https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-$ARCH.AppImage
+# chmod +x linuxdeploy-$ARCH.AppImage
 
-# appimage
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DNVIDIA_SUPPORT=ON -DAMDGPU_SUPPORT=ON -DCMAKE_INSTALL_PREFIX=/usr
-DESTDIR=../release/$DIR cmake --build build --target install
-./linuxdeploy-$ARCH.AppImage --appdir release/$DIR -i release/$DIR/desktop/nvtop.svg -d release/$DIR/desktop/nvtop.desktop --output appimage
-if [ "$1" == "nightly" ]; then
-    mv nvtop-$VERSION-$ARCH.AppImage release/nvtop-nightly-$VERSION-$ARCH.AppImage
-else
-    mv nvtop-$VERSION-$ARCH.AppImage release
-fi
+# # appimage
+# cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DNVIDIA_SUPPORT=ON -DAMDGPU_SUPPORT=ON -DCMAKE_INSTALL_PREFIX=/usr
+# DESTDIR=../release/$DIR cmake --build build --target install
+# ./linuxdeploy-$ARCH.AppImage --appdir release/$DIR -i release/$DIR/desktop/nvtop.svg -d release/$DIR/desktop/nvtop.desktop --output appimage
+# if [ "$1" == "nightly" ]; then
+#     mv nvtop-$VERSION-$ARCH.AppImage release/nvtop-nightly-$VERSION-$ARCH.AppImage
+# else
+#     mv nvtop-$VERSION-$ARCH.AppImage release
+# fi
 
-rm linuxdeploy-$ARCH.AppImage
+# rm linuxdeploy-$ARCH.AppImage
 
 # debian package
 cd release/$DIR
