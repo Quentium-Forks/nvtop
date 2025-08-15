@@ -124,11 +124,11 @@ jobs:
       - name: Install libraries
         run: |
           apt-get install -y libncurses-dev libdrm-dev libsystemd-dev libudev-dev
-          apt-get install -y libfuse2
+          apt-get install -y libfuse2 fuse
 
       - name: Install build tools
         run: |
-          DEBIAN_FRONTEND=noninteractive apt-get install -y cmake dh-make devscripts build-essential lintian wget rpm
+          DEBIAN_FRONTEND=noninteractive apt-get install -y cmake dh-make devscripts build-essential lintian wget rpm pkg-config
 
       - name: Build and make nightly release
         run: |
