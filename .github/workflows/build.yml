@@ -114,7 +114,7 @@ jobs:
           fetch-tags: true
 
       - name: Setup CMake 3.18
-        uses: jwlawson/actions-setup-cmake@v2
+        uses: whitty/actions-setup-cmake@linux-aarch64
         with:
           cmake-version: 3.18
 

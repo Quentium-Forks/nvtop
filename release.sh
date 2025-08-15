@@ -65,10 +65,11 @@ tar -czf release/$DIR.tar.gz -C release $DIR
 ls -al
 
 # debian package
+ls -al release
 cd release/$DIR
-ls -al
 cat debian/changelog
 dh_make --createorig --indep --yes
+ls -al
 debuild --no-lintian -us -uc
 cd ../..
 
