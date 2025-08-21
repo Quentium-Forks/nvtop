@@ -8,6 +8,14 @@ on:
         type: boolean
         required: true
         default: false
+      distro-os:
+        description: "Distro OS build"
+        type: choice
+        required: true
+        default: ubuntu
+        options:
+          - ubuntu
+          - debian
       distro-build:
         description: "Distro codename (or version) build"
         type: string
@@ -193,17 +201,17 @@ jobs:
           keep_changelog: true
 
   distro-build:
-    name: Build Distro App
+    name: Build ${{ github.event.inputs.distro-os }} ${{ github.event.inputs.distro-build }} App
     strategy:
       matrix:
         os: [ubuntu-24.04, ubuntu-24.04-arm]
         include:
           - os: ubuntu-24.04
             codename: ${{ github.event.inputs.distro-build }}
-            image: ubuntu
+            image: ${{ github.event.inputs.distro-os }}
           - os: ubuntu-24.04-arm
             codename: ${{ github.event.inputs.distro-build }}-arm
-            image: arm64v8/ubuntu
+            image: arm64v8/${{ github.event.inputs.distro-os }}
     runs-on: ${{ matrix.os }}
     container:
       image: ${{ matrix.image }}:${{ github.event.inputs.distro-build }}

@@ -5,7 +5,7 @@ nvtop (3.2.0.2-1) stable; urgency=medium
   * Fix build no longer included in PPA publishing (rely on CMake to install bin and assets)
   * Build type as release & use CMake instead of make
   * Bump versions to oldest supported in workflows
-  * Add GitHub Action job to build on other distros of Ubuntu (previous or not LTS versions, minimum is focal)
+  * Add GitHub Action job to build on other distros of Ubuntu or Debian (previous or not LTS versions, minimum is focal or bullseye)
 
  -- Quentin Lienhardt <pro@quentium.fr>  Tue, 14 Aug 2025 18:00:00 +0100
 
