@@ -8,6 +8,11 @@ on:
         type: boolean
         required: true
         default: false
+      distro-build:
+        description: "Distro codename (or version) build"
+        type: string
+        required: false
+        default: ""
       publish:
         description: "Publish to PPA"
         type: boolean
@@ -25,15 +30,15 @@ jobs:
         os: [ubuntu-24.04, ubuntu-24.04-arm, ubuntu-22.04, ubuntu-22.04-arm]
         include:
           - os: ubuntu-24.04
-            codename: "noble"
+            codename: noble
           - os: ubuntu-24.04-arm
-            codename: "noble-arm"
+            codename: noble-arm
           - os: ubuntu-22.04
-            codename: "jammy"
+            codename: jammy
           - os: ubuntu-22.04-arm
-            codename: "jammy-arm"
+            codename: jammy-arm
     runs-on: ${{ matrix.os }}
-    if: ${{ github.event_name == 'push' || github.event.inputs.nightly-build == 'false' }}
+    if: ${{ github.event_name == 'push' || github.event.inputs.nightly-build == 'false' && github.event.inputs.distro-build == '' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -43,8 +48,8 @@ jobs:
 
       - name: Install libraries
         run: |
-          sudo apt-get install libncurses-dev libdrm-dev libsystemd-dev libudev-dev
-          sudo apt-get install libfuse2
+          sudo apt-get install -y libncurses-dev libdrm-dev libsystemd-dev libudev-dev
+          sudo apt-get install -y libfuse2
 
       - name: Install build tools
         run: |
@@ -80,7 +85,7 @@ jobs:
 
       - name: Publish PPA package
         uses: yuezk/publish-ppa-package@main
-        if: github.event_name != 'workflow_dispatch' && matrix.codename == 'jammy'
+        if: matrix.codename == 'jammy'
         with:
           tarball: ${{ github.workspace }}/release/nvtop-*.tar.gz
           debian_dir: ${{ github.workspace }}/debian/
@@ -97,12 +102,12 @@ jobs:
     name: Build Nightly App
     strategy:
       matrix:
-        os: [ubuntu-22.04, ubuntu-22.04-arm]
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
         include:
-          - os: ubuntu-22.04
-            codename: "jammy"
-          - os: ubuntu-22.04-arm
-            codename: "jammy-arm"
+          - os: ubuntu-24.04
+            codename: noble
+          - os: ubuntu-24.04-arm
+            codename: noble-arm
     runs-on: ${{ matrix.os }}
     if: ${{ github.event.inputs.nightly-build == 'true' }}
     steps:
@@ -112,13 +117,16 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
+      - name: Setup latest CMake
+        uses: whitty/actions-setup-cmake@linux-aarch64
+
       - name: Update package repositories
         run: sudo apt-get update
 
       - name: Install libraries
         run: |
-          sudo apt-get install libncurses-dev libdrm-dev libsystemd-dev libudev-dev
-          sudo apt-get install libfuse2
+          sudo apt-get install -y libncurses-dev libdrm-dev libsystemd-dev libudev-dev
+          sudo apt-get install -y libfuse2
 
       - name: Install build tools
         run: |
@@ -140,8 +148,8 @@ jobs:
       - name: Get commit count
         id: commit_count
         run: |
-          LAST_TAG=$(git describe --tags --abbrev=0 || echo "HEAD")
-          COMMITS=$(git rev-list --count $LAST_TAG..HEAD)
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "HEAD")
+          COMMITS=$(git rev-list --count $LAST_TAG..HEAD 2>/dev/null || echo 0)
           echo "last_tag=$LAST_TAG" >> $GITHUB_ENV
           echo "commit_count=$COMMITS" >> $GITHUB_ENV
 
@@ -170,7 +178,7 @@ jobs:
 
       - name: Publish PPA package
         uses: yuezk/publish-ppa-package@main
-        if: github.event.inputs.publish == 'true' && matrix.codename == 'jammy'
+        if: github.event.inputs.publish == 'true' && !contains(matrix.codename, 'arm')
         with:
           tarball: ${{ github.workspace }}/release/nvtop-nightly-*.tar.gz
           debian_dir: ${{ github.workspace }}/debian/
@@ -180,6 +188,107 @@ jobs:
           gpg_private_key: ${{ secrets.PPA_GPG_PRIVATE_KEY }}
           gpg_passphrase: ${{ secrets.PPA_GPG_PASSPHRASE }}
           series: "noble jammy"
+          revision: ${{ env.revision }}
+          new_version_template: "{VERSION}-{REVISION}+{SERIES}"
+          keep_changelog: true
+
+  distro-build:
+    name: Build Distro App
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+        include:
+          - os: ubuntu-24.04
+            codename: ${{ github.event.inputs.distro-build }}
+            image: ubuntu
+          - os: ubuntu-24.04-arm
+            codename: ${{ github.event.inputs.distro-build }}-arm
+            image: arm64v8/ubuntu
+    runs-on: ${{ matrix.os }}
+    container:
+      image: ${{ matrix.image }}:${{ github.event.inputs.distro-build }}
+      options: --device /dev/fuse --cap-add SYS_ADMIN --security-opt apparmor:unconfined
+    if: ${{ github.event.inputs.distro-build != '' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Setup CMake 3.22
+        uses: whitty/actions-setup-cmake@linux-aarch64
+        with:
+          cmake-version: 3.22
+
+      - name: Update package repositories
+        run: apt-get update
+
+      - name: Install libraries
+        run: |
+          DEBIAN_FRONTEND=noninteractive apt-get install -y libncurses-dev libdrm-dev libsystemd-dev libudev-dev
+          DEBIAN_FRONTEND=noninteractive apt-get install -y libfuse2
+
+      - name: Install build tools
+        run: |
+          DEBIAN_FRONTEND=noninteractive apt-get install -y cmake dh-make devscripts build-essential lintian wget rpm pkg-config
+
+      - name: Build and make nightly release
+        run: |
+          bash /__w/nvtop/nvtop/release.sh nightly
+
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nvtop-distro-${{ matrix.codename }}
+          path: |
+            /__w/nvtop/nvtop/release/nvtop-nightly_*.deb
+            /__w/nvtop/nvtop/release/nvtop-nightly-*.rpm
+            /__w/nvtop/nvtop/release/nvtop-nightly-*.AppImage
+
+      - name: Get commit count
+        id: commit_count
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "HEAD")
+          COMMITS=0
+          echo "last_tag=$LAST_TAG" >> $GITHUB_ENV
+          echo "commit_count=$COMMITS" >> $GITHUB_ENV
+
+      - name: Update debian files
+        run: |
+          sed -i "s/${{ env.last_tag }}-/${{ env.last_tag }}+${{ env.commit_count }}-/g" /__w/nvtop/nvtop/debian/changelog
+          sed -i "s/^nvtop/nvtop-nightly/g" /__w/nvtop/nvtop/debian/changelog
+          sed -i "s/ nvtop$/ nvtop-nightly/g" /__w/nvtop/nvtop/debian/control
+          sed -i "s/Recommends: systemd/Provides: nvtop\nRecommends: systemd/g" /__w/nvtop/nvtop/debian/control
+          sed -i "s/Recommends: systemd/Conflicts: nvtop\nRecommends: systemd/g" /__w/nvtop/nvtop/debian/control
+          sed -i "s/Recommends: systemd/Replaces: nvtop\nRecommends: systemd/g" /__w/nvtop/nvtop/debian/control
+          sed -i "s/^Architecture:\s\+.*$/Architecture: any/g" /__w/nvtop/nvtop/debian/control
+          REVISION=$(grep -oP '\-\d+' debian/changelog | head -n 1 | cut -d '-' -f 2)
+          echo "revision=$REVISION" >> $GITHUB_ENV
+
+      - name: Display debian folder
+        run: |
+          echo "Debian folder content:"
+          ls -la /__w/nvtop/nvtop/debian/
+          echo "Release folder content:"
+          ls -la /__w/nvtop/nvtop/release/
+          echo "Control file content:"
+          cat /__w/nvtop/nvtop/debian/control
+          echo "Changelog file content:"
+          cat /__w/nvtop/nvtop/debian/changelog
+
+      - name: Publish PPA package
+        uses: yuezk/publish-ppa-package@main
+        if: github.event.inputs.publish == 'true' && !contains(matrix.codename, 'arm')
+        with:
+          tarball: /__w/nvtop/nvtop/release/nvtop-nightly-*.tar.gz
+          debian_dir: /__w/nvtop/nvtop/debian/
+          repository: "quentiumyt/nvtop"
+          deb_email: "pro@quentium.fr"
+          deb_fullname: "Quentin Lienhardt"
+          gpg_private_key: ${{ secrets.PPA_GPG_PRIVATE_KEY }}
+          gpg_passphrase: ${{ secrets.PPA_GPG_PASSPHRASE }}
+          series: ${{ github.event.inputs.distro-build }}
           revision: ${{ env.revision }}
           new_version_template: "{VERSION}-{REVISION}+{SERIES}"
           keep_changelog: true

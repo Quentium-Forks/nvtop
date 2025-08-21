@@ -19,8 +19,9 @@ cp -r src include cmake CMakeLists.txt debian desktop manpage tests release/$DIR
 
 if [ "$1" == "nightly" ]; then
     # Number of commits since last tag
-    LAST_TAG=$(git describe --tags --abbrev=0 || echo "HEAD")
-    COMMITS=$(git rev-list --count $LAST_TAG..HEAD)
+    LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "HEAD")
+    # Will return 0 if git is not found
+    COMMITS=$(git rev-list --count $LAST_TAG..HEAD 2>/dev/null || echo 0)
     echo "Build number: $COMMITS"
 
     # Increase version number
@@ -65,8 +66,16 @@ rm linuxdeploy-$ARCH.AppImage
 
 # debian package
 cd release/$DIR
+# Define these 2 env variables for dh_make when running inside a container
+if [ -z "$LOGNAME" ]; then
+    export LOGNAME=$(whoami)
+fi
+if [ -z "$USER" ]; then
+    export USER=$(whoami)
+fi
 dh_make --createorig --indep --yes
-debuild --no-lintian -us -uc
+# Force CMake install step to be included in PATH for debuild
+debuild --set-envvar=PATH="$PATH" --no-lintian -us -uc
 cd ../..
 
 # rpm package
