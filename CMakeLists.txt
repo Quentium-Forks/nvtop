@@ -70,6 +70,7 @@ if(APPLE)
   set(PANFROST_SUPPORT_DEFAULT OFF)
   set(PANTHOR_SUPPORT_DEFAULT OFF)
   set(ASCEND_SUPPORT_DEFAULT OFF)
+  set(METAX_SUPPORT_DEFAULT OFF)
 elseif(ASCEND_SUPPORT)
   set(APPLE_SUPPORT_DEFAULT OFF)
   set(NVIDIA_SUPPORT_DEFAULT OFF)
@@ -79,6 +80,7 @@ elseif(ASCEND_SUPPORT)
   set(PANFROST_SUPPORT_DEFAULT OFF)
   set(PANTHOR_SUPPORT_DEFAULT OFF)
   set(ASCEND_SUPPORT_DEFAULT ON)
+  set(METAX_SUPPORT_DEFAULT OFF)
 else()
   set(APPLE_SUPPORT_DEFAULT OFF)
   set(NVIDIA_SUPPORT_DEFAULT ON)
@@ -89,6 +91,7 @@ else()
   set(PANFROST_SUPPORT_DEFAULT ON)
   set(PANTHOR_SUPPORT_DEFAULT ON)
   set(ASCEND_SUPPORT_DEFAULT OFF)
+  set(METAX_SUPPORT_DEFAULT ON)
 endif()
 
 # TPU support is only available on Linux
@@ -108,6 +111,15 @@ else()
   set(TPU_SUPPORT_DEFAULT OFF)
 endif()
 
+# Rockchip support is only available on Linux on arm
+# Enable Rockchip support only on ARM Linux
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux" AND
+    (CMAKE_SYSTEM_PROCESSOR MATCHES "armv7" OR CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64"))
+  set(ROCKCHIP_SUPPORT_DEFAULT ON)
+else()
+  set(ROCKCHIP_SUPPORT_DEFAULT OFF)
+endif()
+
 option(NVIDIA_SUPPORT "Build support for NVIDIA GPUs through libnvml" ${NVIDIA_SUPPORT_DEFAULT})
 option(AMDGPU_SUPPORT "Build support for AMD GPUs through amdgpu driver" ${AMDGPU_SUPPORT_DEFAULT})
 option(INTEL_SUPPORT "Build support for Intel GPUs through i915 or xe driver" ${INTEL_SUPPORT_DEFAULT})
@@ -118,6 +130,8 @@ option(PANTHOR_SUPPORT "Build support for Mali GPUs through panthor driver" ${PA
 option(ASCEND_SUPPORT "Build support for Ascend NPUs through Ascend DCMI" ${ASCEND_SUPPORT_DEFAULT})
 option(V3D_SUPPORT "Build support for Raspberrypi through v3d" ${V3D_SUPPORT_DEFAULT})
 option(TPU_SUPPORT "Build support for Google TPUs through GRPC" ${TPU_SUPPORT_DEFAULT})
+option(ROCKCHIP_SUPPORT "Enable support for Rockchip NPU" ${ROCKCHIP_SUPPORT_DEFAULT})
+option(METAX_SUPPORT "Build support for MetaX GPUs through libmxsml" ${METAX_SUPPORT_DEFAULT})
 
 add_subdirectory(src)
 
