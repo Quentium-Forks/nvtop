@@ -201,7 +201,7 @@ jobs:
           keep_changelog: true
 
   distro-build:
-    name: Build ${{ github.event.inputs.distro-os }} ${{ github.event.inputs.distro-build }} App
+    name: Build ${{ github.event.inputs.distro-os }} ${{ matrix.codename }} App
     strategy:
       matrix:
         os: [ubuntu-24.04, ubuntu-24.04-arm]
@@ -216,7 +216,7 @@ jobs:
     container:
       image: ${{ matrix.image }}:${{ github.event.inputs.distro-build }}
       options: --device /dev/fuse --cap-add SYS_ADMIN --security-opt apparmor:unconfined
-    if: ${{ github.event.inputs.distro-build != '' }}
+    if: ${{ github.event.inputs.distro-build != '' }} && ${{ github.event.inputs.nightly-build == 'false' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -227,6 +227,7 @@ jobs:
       - name: Setup CMake 3.22
         uses: whitty/actions-setup-cmake@linux-aarch64
         with:
+          # 3.22 is the minimum required version for arm builds
           cmake-version: 3.22
 
       - name: Update package repositories
