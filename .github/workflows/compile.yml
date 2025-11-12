@@ -19,22 +19,25 @@ jobs:
       DEBIAN_FRONTEND: noninteractive
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-    - name: Install dependencies
-      run: sudo apt-get install -y libncurses-dev libdrm-dev libsystemd-dev
+      - name: Update apt cache
+        run: sudo apt-get update
 
-    - name: Configure CMake
-      run: cmake -S . -B $BUILD_DIR
+      - name: Install dependencies
+        run: sudo apt-get install -y libncurses-dev libdrm-dev libsystemd-dev
 
-    - name: Build
-      run: cmake --build $BUILD_DIR
+      - name: Configure CMake
+        run: cmake -S . -B $BUILD_DIR
 
-    - name: Install
-      run: DESTDIR="$PWD/build/install" cmake --build $BUILD_DIR --target install
-      
-    - name: Upload
-      uses: actions/upload-artifact@v4
-      with:
-        name: nvtop ${{ matrix.os }}
-        path: ${{ env.BUILD_DIR }}/install
+      - name: Build
+        run: cmake --build $BUILD_DIR
+
+      - name: Install
+        run: DESTDIR="$PWD/build/install" cmake --build $BUILD_DIR --target install
+
+      - name: Upload
+        uses: actions/upload-artifact@v5
+        with:
+          name: nvtop ${{ matrix.os }}
+          path: ${{ env.BUILD_DIR }}/install
