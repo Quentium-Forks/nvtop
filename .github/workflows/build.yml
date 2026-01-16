@@ -9,14 +9,14 @@ on:
         required: true
         default: false
       distro-os:
-        description: "Distro OS build"
+        description: "Distro OS build (ignored if distro codename is empty)"
         type: choice
         required: true
         default: ubuntu
         options:
           - ubuntu
           - debian
-      distro-build:
+      distro-codename:
         description: "Distro codename (or version) build"
         type: string
         required: false
@@ -46,7 +46,7 @@ jobs:
           - os: ubuntu-22.04-arm
             codename: jammy-arm
     runs-on: ${{ matrix.os }}
-    if: ${{ github.event_name == 'push' || github.event.inputs.nightly-build == 'false' && github.event.inputs.distro-build == '' }}
+    if: github.event_name == 'push' || github.event.inputs.nightly-build == 'false' && github.event.inputs.distro-codename == ''
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -117,7 +117,7 @@ jobs:
           - os: ubuntu-24.04-arm
             codename: noble-arm
     runs-on: ${{ matrix.os }}
-    if: ${{ github.event.inputs.nightly-build == 'true' }}
+    if: github.event.inputs.nightly-build == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -207,16 +207,16 @@ jobs:
         os: [ubuntu-24.04, ubuntu-24.04-arm]
         include:
           - os: ubuntu-24.04
-            codename: ${{ github.event.inputs.distro-build }}
+            codename: ${{ github.event.inputs.distro-codename }}
             image: ${{ github.event.inputs.distro-os }}
           - os: ubuntu-24.04-arm
-            codename: ${{ github.event.inputs.distro-build }}-arm
+            codename: ${{ github.event.inputs.distro-codename }}-arm
             image: arm64v8/${{ github.event.inputs.distro-os }}
     runs-on: ${{ matrix.os }}
     container:
-      image: ${{ matrix.image }}:${{ github.event.inputs.distro-build }}
+      image: ${{ matrix.image }}:${{ github.event.inputs.distro-codename }}
       options: --device /dev/fuse --cap-add SYS_ADMIN --security-opt apparmor:unconfined
-    if: ${{ github.event.inputs.distro-build != '' }} && ${{ github.event.inputs.nightly-build == 'false' }}
+    if: github.event.inputs.distro-codename != '' && github.event.inputs.nightly-build == 'false'
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -297,7 +297,7 @@ jobs:
           deb_fullname: "Quentin Lienhardt"
           gpg_private_key: ${{ secrets.PPA_GPG_PRIVATE_KEY }}
           gpg_passphrase: ${{ secrets.PPA_GPG_PASSPHRASE }}
-          series: ${{ github.event.inputs.distro-build }}
+          series: ${{ github.event.inputs.distro-codename }}
           revision: ${{ env.revision }}
           new_version_template: "{VERSION}-{REVISION}+{SERIES}"
           keep_changelog: true
