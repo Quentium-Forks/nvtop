@@ -227,7 +227,7 @@ jobs:
       # - name: Setup CMake 3.22
       #   uses: whitty/actions-setup-cmake@linux-aarch64
       #   with:
-      #     # 3.22 is the minimum required version for arm builds
+      #     # 3.22 is the minimum available version for arm builds using this action
       #     cmake-version: 3.22
 
       - name: Update package repositories
