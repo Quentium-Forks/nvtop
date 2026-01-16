@@ -1,3 +1,27 @@
+nvtop (3.3.0-1) stable; urgency=medium
+
+  * Rockchip NPU - @feilongfl
+  * MetaX GPUs - @zhenyu-xu-metax
+  * Enflame GCU - @QShen3
+
+  * More memory reporting in one-shot mode - @mintyleaf
+  * CTRL + L will reset the ncurses interface - @cipri-tom + @claude
+  * GPU and MEM have separate clock fields - @KaeLL
+  * Effective load metric, i.e., the percentage utilization weighted by the ratio (Current Power / Max Power) - @airvzxf
+
+  * Fix assertion failure on processing the same client ID twice - @Andrew1326
+  * Application desktop metadata install paths and name - @michel-slm
+  * New PPA maintainer - @QuentiumYT
+  * Fixes for Mali GPU - @larunbe
+  * Power draw for Intel Battelmage - @Steve-Tech
+  * Unified memory usage reporting on Nvidia GPUs - @sbhavani
+  * AMDGPU integrated graphics accounts for both VRAM and GTT - @superm1
+
+  * Manpage update - @polluks
+  * Fix typos - @oxyzenQ
+
+ -- Quentin Lienhardt <pro@quentium.fr>  Fri, 16 Jan 2026 15:04:49 +0100
+
 nvtop (3.2.0.2-1) stable; urgency=medium
 
   * Add arm64 builds with GitHub Actions (deb, rpm and AppImage)
