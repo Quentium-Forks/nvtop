@@ -201,7 +201,7 @@ jobs:
           keep_changelog: true
 
   distro-build:
-    name: Build ${{ github.event.inputs.distro-os }} ${{ matrix.codename }} App
+    name: Build Distro App
     strategy:
       matrix:
         os: [ubuntu-24.04, ubuntu-24.04-arm]
@@ -242,7 +242,7 @@ jobs:
         run: |
           DEBIAN_FRONTEND=noninteractive apt-get install -y cmake dh-make devscripts build-essential lintian wget rpm pkg-config
 
-      - name: Build and make nightly release
+      - name: Build and make ${{ github.event.inputs.distro-os }} ${{ matrix.codename }} release
         run: |
           bash /__w/nvtop/nvtop/release.sh nightly
 
