@@ -1,5 +1,5 @@
 Name:           nvtop
-Version:        3.3.0
+Version:        3.3.1
 Release:        1%{?dist}
 Summary:        GPU & Accelerator process monitoring for AMD, Apple, Huawei, Intel, NVIDIA and Qualcomm
 
