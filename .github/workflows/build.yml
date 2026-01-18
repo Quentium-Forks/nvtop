@@ -157,7 +157,12 @@ jobs:
         id: commit_count
         run: |
           LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "HEAD")
-          COMMITS=$(git rev-list --count $LAST_TAG..HEAD 2>/dev/null || echo 0)
+          if [ "$LAST_TAG" = "HEAD" ]; then
+            COMMITS=0
+          else
+            TAG_TS=$(git show -s --format=%ct "$LAST_TAG")
+            COMMITS=$(git rev-list --count --since=$((TAG_TS+1)) HEAD 2>/dev/null || echo 0)
+          fi
           echo "last_tag=$LAST_TAG" >> $GITHUB_ENV
           echo "commit_count=$COMMITS" >> $GITHUB_ENV
 
