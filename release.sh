@@ -21,7 +21,12 @@ if [ "$1" == "nightly" ]; then
     # Number of commits since last tag
     LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "HEAD")
     # Will return 0 if git is not found
-    COMMITS=$(git rev-list --count $LAST_TAG..HEAD 2>/dev/null || echo 0)
+    if [ "$LAST_TAG" = "HEAD" ]; then
+        COMMITS=0
+    else
+        TAG_TS=$(git show -s --format=%ct "$LAST_TAG")
+        COMMITS=$(git rev-list --count --since=$((TAG_TS + 1)) HEAD 2>/dev/null || echo 0)
+    fi
     echo "Build number: $COMMITS"
 
     # Increase version number
