@@ -68,7 +68,7 @@ jobs:
           bash ${{ github.workspace }}/release.sh
 
       - name: Upload workflow artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: nvtop-${{ matrix.codename }}
           path: |
@@ -126,7 +126,7 @@ jobs:
           fetch-tags: true
 
       - name: Setup latest CMake
-        uses: whitty/actions-setup-cmake@linux-aarch64
+        uses: jwlawson/actions-setup-cmake
 
       - name: Update package repositories
         run: sudo apt-get update
@@ -145,7 +145,7 @@ jobs:
           bash ${{ github.workspace }}/release.sh nightly
 
       - name: Upload workflow artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: nvtop-nightly-${{ matrix.codename }}
           path: |
@@ -229,12 +229,6 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
-      # - name: Setup CMake 3.22
-      #   uses: whitty/actions-setup-cmake@linux-aarch64
-      #   with:
-      #     # 3.22 is the minimum available version for arm builds using this action
-      #     cmake-version: 3.22
-
       - name: Update package repositories
         run: apt-get update
 
@@ -252,7 +246,7 @@ jobs:
           bash /__w/nvtop/nvtop/release.sh nightly
 
       - name: Upload workflow artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: nvtop-distro-${{ matrix.codename }}
           path: |
