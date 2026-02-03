@@ -19,13 +19,13 @@ cp -r src include cmake CMakeLists.txt debian desktop manpage tests release/$DIR
 
 if [ "$1" == "nightly" ]; then
     # Number of commits since last tag
-    LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "HEAD")
+    LAST_TAG=$(git describe --tags --abbrev=0 2> /dev/null || echo "HEAD")
     # Will return 0 if git is not found
     if [ "$LAST_TAG" = "HEAD" ]; then
         COMMITS=0
     else
         TAG_TS=$(git show -s --format=%ct "$LAST_TAG")
-        COMMITS=$(git rev-list --count --since=$((TAG_TS + 1)) HEAD 2>/dev/null || echo 0)
+        COMMITS=$(git rev-list --count --since=$((TAG_TS + 1)) HEAD 2> /dev/null || echo 0)
     fi
     echo "Build number: $COMMITS"
 
@@ -59,7 +59,7 @@ chmod +x linuxdeploy-$ARCH.AppImage
 
 # appimage
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DNVIDIA_SUPPORT=ON -DAMDGPU_SUPPORT=ON -DCMAKE_INSTALL_PREFIX=/usr
-DESTDIR=../release/$DIR cmake --build build --target install
+DESTDIR=../release/$DIR cmake --build build --target install -j $(nproc)
 ./linuxdeploy-$ARCH.AppImage --appdir release/$DIR -i release/$DIR/desktop/nvtop.svg -d release/$DIR/desktop/nvtop.desktop --output appimage
 if [ "$1" == "nightly" ]; then
     mv nvtop-$VERSION-$ARCH.AppImage release/nvtop-nightly-$VERSION-$ARCH.AppImage

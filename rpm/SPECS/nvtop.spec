@@ -17,30 +17,26 @@ NVTOP stands for Neat Videocard TOP, a (h)top like task monitor for GPUs and acc
 %setup -q
 
 %build
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DNVIDIA_SUPPORT=ON -DAMDGPU_SUPPORT=ON
+cmake -S . -B build \
+    -DCMAKE_INSTALL_PREFIX=%{_prefix} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DNVIDIA_SUPPORT=ON \
+    -DAMDGPU_SUPPORT=ON
+
 cmake --build build -j $(nproc)
 
 %install
 rm -rf %{buildroot}
 
-# Install binary
-install -Dm755 build/src/nvtop %{buildroot}/usr/bin/nvtop
-
-# Install .desktop file
-install -Dm644 desktop/nvtop.desktop %{buildroot}/usr/share/applications/nvtop.desktop
-
-# Install svg icon
-install -Dm644 desktop/nvtop.svg %{buildroot}/usr/share/icons/hicolor/scalable/apps/nvtop.svg
-
-# Install README doc
-install -Dm644 README.markdown %{buildroot}/usr/share/doc/nvtop/README.md
+DESTDIR=%{buildroot} cmake --install build
 
 %files
-%license
-%doc
-/usr/bin/nvtop
-/usr/share/applications/nvtop.desktop
-/usr/share/icons/hicolor/scalable/apps/nvtop.svg
-/usr/share/doc/nvtop/README.md
+%license LICENSE
+%doc README.markdown
+%{_bindir}/%{name}
+%{_datadir}/applications/%{name}.desktop
+%{_datadir}/metainfo/io.github.syllo.%{name}.metainfo.xml
+%{_datadir}/icons/hicolor/scalable/apps/%{name}.svg
+%{_mandir}/man1/%{name}.1.*
 
 %changelog
