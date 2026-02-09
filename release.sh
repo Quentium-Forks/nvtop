@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION=3.3.1
+VERSION=3.3.2
 DIR=nvtop-$VERSION
 ARCH=$(uname -m)
 ARCH_DPKG=$(dpkg --print-architecture)
@@ -91,6 +91,7 @@ if [ "$1" == "nightly" ]; then
     cp rpm/SPECS/nvtop.spec rpm/SPECS/nvtop-nightly.spec
     # Change package name
     sed -i "s/^Name:\s\+nvtop$/Name: nvtop-nightly/g" rpm/SPECS/nvtop-nightly.spec
+    sed -i "s/%{name}/nvtop/g" rpm/SPECS/nvtop-nightly.spec
     # Increase version number
     sed -i "s/^Version:\s\+.*$/Version: $VERSION/g" rpm/SPECS/nvtop-nightly.spec
     # Change architecture
