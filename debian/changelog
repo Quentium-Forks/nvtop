@@ -7,7 +7,7 @@ nvtop (3.3.2-1) stable; urgency=medium
 
  -- Quentin Lienhardt <pro@quentium.fr>  Mon, 09 Feb 2026 11:00:00 +0100
 
- nvtop (3.3.1-1) stable; urgency=medium
+nvtop (3.3.1-1) stable; urgency=medium
 
   * Fix a regression that would miss-report available device memory of NVIDIA GPUs
   * Integrate effective/efficiency usage within the GPU utilization metric

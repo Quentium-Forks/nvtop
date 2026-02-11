@@ -9,7 +9,7 @@ export VERSION=$VERSION
 rm -rf release build rpm/BUILDROOT rpm/*RPMS rpm/SOURCES
 
 # build
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DNVIDIA_SUPPORT=ON -DAMDGPU_SUPPORT=ON
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DNVIDIA_SUPPORT=ON -DAMDGPU_SUPPORT=ON -DCMAKE_INSTALL_PREFIX=/usr
 cmake --build build -j $(nproc)
 strip -s build/src/nvtop
 
@@ -58,7 +58,6 @@ wget -qc https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous
 chmod +x linuxdeploy-$ARCH.AppImage
 
 # appimage
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DNVIDIA_SUPPORT=ON -DAMDGPU_SUPPORT=ON -DCMAKE_INSTALL_PREFIX=/usr
 DESTDIR=../release/$DIR cmake --build build --target install -j $(nproc)
 ./linuxdeploy-$ARCH.AppImage --appdir release/$DIR -i release/$DIR/desktop/nvtop.svg -d release/$DIR/desktop/nvtop.desktop --output appimage
 if [ "$1" == "nightly" ]; then
