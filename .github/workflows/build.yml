@@ -154,7 +154,6 @@ jobs:
             ${{ github.workspace }}/release/nvtop-nightly-*.AppImage
 
       - name: Get commit count
-        id: commit_count
         run: |
           LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "HEAD")
           if [ "$LAST_TAG" = "HEAD" ]; then
@@ -255,7 +254,6 @@ jobs:
             /__w/nvtop/nvtop/release/nvtop-nightly-*.AppImage
 
       - name: Get commit count
-        id: commit_count
         run: |
           LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "HEAD")
           COMMITS=0
