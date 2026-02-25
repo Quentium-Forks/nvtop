@@ -21,7 +21,8 @@ cmake -S . -B build \
     -DCMAKE_INSTALL_PREFIX=%{_prefix} \
     -DCMAKE_BUILD_TYPE=Release \
     -DNVIDIA_SUPPORT=ON \
-    -DAMDGPU_SUPPORT=ON
+    -DAMDGPU_SUPPORT=ON \
+    -DINTEL_SUPPORT=ON
 
 cmake --build build -j $(nproc)
 

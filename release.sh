@@ -9,7 +9,7 @@ export VERSION=$VERSION
 rm -rf release build rpm/BUILDROOT rpm/*RPMS rpm/SOURCES
 
 # build
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DNVIDIA_SUPPORT=ON -DAMDGPU_SUPPORT=ON -DCMAKE_INSTALL_PREFIX=/usr
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DNVIDIA_SUPPORT=ON -DAMDGPU_SUPPORT=ON -DINTEL_SUPPORT=ON -DCMAKE_INSTALL_PREFIX=/usr
 cmake --build build -j $(nproc)
 strip -s build/src/nvtop
 
