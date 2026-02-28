@@ -68,7 +68,7 @@ jobs:
           bash ${{ github.workspace }}/release.sh
 
       - name: Upload workflow artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: nvtop-${{ matrix.codename }}
           path: |
@@ -145,7 +145,7 @@ jobs:
           bash ${{ github.workspace }}/release.sh nightly
 
       - name: Upload workflow artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: nvtop-nightly-${{ matrix.codename }}
           path: |
@@ -245,7 +245,7 @@ jobs:
           bash /__w/nvtop/nvtop/release.sh nightly
 
       - name: Upload workflow artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: nvtop-distro-${{ matrix.codename }}
           path: |
