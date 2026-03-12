@@ -1,83 +1,100 @@
 name: nvtop
-base: core22
 adopt-info: nvtop
-summary: 'GPUs monitoring tool for AMD, Intel and NVIDIA'
+title: NVTOP
+base: core24
+summary: "GPUs monitoring tool for AMD, Intel and NVIDIA"
 description: |
-  Nvtop stands for Neat Videocard TOP, a (h)top like task monitor for AMD, Intel and NVIDIA GPUs. It can handle multiple GPUs and print information about them in a htop familiar way.
+  NVTOP stands for Neat Videocard TOP, a (h)top like task monitor for GPUs and accelerators. It can handle multiple GPUs and print information about them in a htop-familiar way.
 license: GPL-3.0-or-later
-issues: https://github.com/Syllo/nvtop/issues
 icon: desktop/nvtop.svg
+
+website: https://github.com/Syllo/nvtop
+contact: https://github.com/Syllo/nvtop/issues
+source-code: https://github.com/Syllo/nvtop
+issues: https://github.com/Syllo/nvtop/issues
+donation: https://github.com/Syllo/nvtop/issues
+
 grade: stable
 confinement: strict
-architectures:
-- build-on: amd64
-- build-on: arm64
-- build-on: armhf
-- build-on: ppc64el
-- build-on: s390x
-compression: lzo
+
+platforms:
+  amd64:
+    build-on: [amd64]
+    build-for: [amd64]
+  arm64:
+    build-on: [arm64]
+    build-for: [arm64]
+  armhf:
+    build-on: [armhf]
+    build-for: [armhf]
+  ppc64el:
+    build-on: [ppc64el]
+    build-for: [ppc64el]
+  riscv64:
+    build-on: [riscv64]
+    build-for: [riscv64]
+  s390x:
+    build-on: [s390x]
+    build-for: [s390x]
+
 apps:
   nvtop:
     command: usr/bin/nvtop
-    desktop: usr/share/applications/nvtop.desktop
     plugs:
-    - opengl
-    - home
-    - hardware-observe
-    - process-control
-    - system-observe
-    # - kubernetes-support # Temporarily required for nvtop to display AMD GPU processes. Once apparmor rule to allow access to @{PROC}/[0-9]*/fdinfo/ is added to system-observe, this can be removed.
-# layout:
-#   /usr/share/libdrm:
-#     symlink: $SNAP/usr/share/libdrm
+      - opengl
+      - home
+      - hardware-observe
+      - process-control
+      - system-observe
+      # - kubernetes-support # Temporarily required for nvtop to display AMD GPU processes. Once apparmor rule to allow access to @{PROC}/[0-9]*/fdinfo/ is added to system-observe, this can be removed.
+
 parts:
   libdrm:
-    source: https://gitlab.freedesktop.org/mesa/drm.git
-    source-tag: libdrm-2.4.125
+    source: https://gitlab.freedesktop.org/mesa/libdrm.git
+    source-tag: libdrm-2.4.131
     plugin: meson
     meson-parameters:
-    - --prefix=/usr
-    - --sysconfdir=/etc
-    - --libdir=lib/$CRAFT_ARCH_TRIPLET
-    - -Dradeon=enabled
-    - -Damdgpu=enabled
-    - -Dudev=true
-    - -Dnouveau=enabled
-    - -Dintel=enabled
+      - --prefix=/usr
+      - --sysconfdir=/etc
+      - --libdir=lib/$CRAFT_ARCH_TRIPLET
+      - -Dradeon=enabled
+      - -Damdgpu=enabled
+      - -Dudev=true
+      - -Dnouveau=enabled
+      - -Dintel=enabled
     build-packages:
-    - meson
-    - pkg-config
-    - libudev-dev
-    - libpciaccess-dev
+      - meson
+      - pkg-config
+      - libudev-dev
+      - libpciaccess-dev
     stage-packages:
-    - libpciaccess0
+      - libpciaccess0
     prime:
-    - -usr/include
-    - -usr/lib/$CRAFT_ARCH_TRIPLET/pkgconfig
+      - -usr/include
+      - -usr/lib/$CRAFT_ARCH_TRIPLET/pkgconfig
+
   nvtop:
-    after: [ libdrm ]
+    after: [libdrm]
     source: .
     plugin: cmake
     cmake-parameters:
-    - -DCMAKE_INSTALL_PREFIX=/usr
-    - -DNVIDIA_SUPPORT=ON
-    - -DAMDGPU_SUPPORT=ON
-    - -DINTEL_SUPPORT=ON
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_INSTALL_PREFIX=/usr
+      - -DNVIDIA_SUPPORT=ON
+      - -DAMDGPU_SUPPORT=ON
+      - -DINTEL_SUPPORT=ON
+    build-packages:
+      - gcc
+      - libncurses-dev
+      - libsystemd-dev
+    stage-packages:
+      - libncurses6
+      - libncursesw6
+      - libsystemd0
+    prime:
+      - -usr/share/doc
     override-pull: |
-      set -eux
       craftctl default
-      VERSION="$(git describe --tags $(git rev-list --tags --max-count=1))"
+      VERSION="$(git describe --tags --abbrev=0)"
       craftctl set version=$VERSION
       git checkout $VERSION
-    build-snaps:
-    - cmake
-    build-packages:
-    - gcc
-    - libncurses-dev
-    - libsystemd-dev
-    stage-packages:
-    - libncurses6
-    - libncursesw6
-    - libsystemd0
-    prime:
-    - -usr/share/doc
