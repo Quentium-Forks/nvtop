@@ -225,6 +225,8 @@ static void alloc_process_with_option(struct nvtop_interface *interface, unsigne
   interface->process.option_window.previous_state = nvtop_option_state_sort_by;
   interface->process.option_window.offset = 0;
   interface->process.option_window.selected_row = 0;
+  interface->process.option_window.last_key_was_number = false;
+  interface->process.option_window.input_number = 0;
 }
 
 static void initialize_gpu_mem_plot(struct plot_window *plot, struct window_position *position,
@@ -401,7 +403,10 @@ static void delete_all_windows(struct nvtop_interface *dwin) {
   free(dwin->plots);
 }
 
-static void initialize_colors(void) {
+static const NCURSES_COLOR_T plot_terminal_colors[] = {COLOR_RED,  COLOR_CYAN,    COLOR_GREEN, COLOR_YELLOW,
+                                                       COLOR_BLUE, COLOR_MAGENTA, COLOR_WHITE};
+
+static void initialize_colors(const unsigned char plot_color_idx[MAX_LINES_PER_PLOT]) {
   start_color();
   short background_color;
 #ifdef NCURSES_VERSION
@@ -418,6 +423,10 @@ static void initialize_colors(void) {
   init_pair(yellow_color, COLOR_YELLOW, background_color);
   init_pair(blue_color, COLOR_BLUE, background_color);
   init_pair(magenta_color, COLOR_MAGENTA, background_color);
+  static const short gpu_plot_pairs[MAX_LINES_PER_PLOT] = {
+      gpu_util_plot_color, gpu_mem_plot_color, gpu_plot_color_3, gpu_plot_color_4};
+  for (unsigned s = 0; s < MAX_LINES_PER_PLOT; ++s)
+    init_pair(gpu_plot_pairs[s], plot_terminal_colors[plot_color_idx[s]], background_color);
 }
 
 struct nvtop_interface *initialize_curses(unsigned total_devices, unsigned devices_count, unsigned largest_device_name,
@@ -431,7 +440,7 @@ struct nvtop_interface *initialize_curses(unsigned total_devices, unsigned devic
   initscr();
   refresh();
   if (interface->options.use_color && has_colors() == TRUE) {
-    initialize_colors();
+    initialize_colors(options.gpu_plot_color_idx);
   }
   cbreak();
   noecho();
@@ -455,6 +464,10 @@ struct nvtop_interface *initialize_curses(unsigned total_devices, unsigned devic
   interface_alloc_ring_buffer(devices_count, 4, 10 * 60 * 1000, &interface->saved_data_ring);
   initialize_all_windows(interface);
   return interface;
+}
+
+void apply_plot_colors(const unsigned char plot_color_idx[MAX_LINES_PER_PLOT]) {
+  initialize_colors(plot_color_idx);
 }
 
 void clean_ncurses(struct nvtop_interface *interface) {
@@ -1902,6 +1915,8 @@ void interface_key(int keyId, struct nvtop_interface *interface) {
         interface->process.option_window.state == nvtop_option_state_hidden) {
       interface->process.option_window.state = nvtop_option_state_kill;
       interface->process.option_window.selected_row = 0;
+      interface->process.option_window.last_key_was_number = false;
+      interface->process.option_window.input_number = 0;
     }
     break;
   case KEY_F(6):
@@ -1980,9 +1995,37 @@ void interface_key(int keyId, struct nvtop_interface *interface) {
   case 12: // Ctrl+L
     update_window_size_to_terminal_size(interface);
     break;
+  case '0':
+  case '1':
+  case '2':
+  case '3':
+  case '4':
+  case '5':
+  case '6':
+  case '7':
+  case '8':
+  case '9':
+    if (interface->process.option_window.state == nvtop_option_state_kill) {
+      unsigned int val = keyId - '0';
+      if (interface->process.option_window.last_key_was_number) {
+        unsigned int new_val = interface->process.option_window.input_number * 10 + val;
+        if (new_val <= nvtop_num_signals) {
+          interface->process.option_window.input_number = new_val;
+          interface->process.option_window.selected_row = new_val;
+        } else {
+          interface->process.option_window.input_number = val;
+          interface->process.option_window.selected_row = val;
+        }
+      } else {
+        interface->process.option_window.input_number = val;
+        interface->process.option_window.selected_row = val;
+      }
+    }
+    break;
   default:
     break;
   }
+  interface->process.option_window.last_key_was_number = (keyId >= '0' && keyId <= '9');
 }
 
 bool interface_freeze_processes(struct nvtop_interface *interface) {
@@ -2037,7 +2080,8 @@ bool show_information_messages(unsigned num_messages, const char **messages) {
     initscr();
     clear();
     refresh();
-    initialize_colors();
+    static const unsigned char default_plot_colors[MAX_LINES_PER_PLOT] = {1, 3, 2, 4};
+    initialize_colors(default_plot_colors);
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
@@ -2223,31 +2267,35 @@ void print_snapshot(struct list_head *devices, bool use_fahrenheit_option) {
       // PID
       printf("%s\"pid\": \"%d\",\n", indent_level_eight, proc->pid);
 
-      printf("%s\"cmdline\": \"", indent_level_eight);
-      for (char *li = proc->cmdline; *li != '\0'; li++) {
-        // We need to escape some characters for for json strings
-        if (*li == '\n') {
-          printf("\\n");
-          continue;
-        } else if (*li == '\b') {
-          printf("\\b");
-          continue;
-        } else if (*li == '\f') {
-          printf("\\f");
-          continue;
-        } else if (*li == '\r') {
-          printf("\\r");
-          continue;
-        } else if (*li == '\t') {
-          printf("\\t");
-          continue;
+      if (GPUINFO_PROCESS_FIELD_VALID(proc, cmdline) && proc->cmdline) {
+        printf("%s\"cmdline\": \"", indent_level_eight);
+        for (char *li = proc->cmdline; *li != '\0'; li++) {
+          // We need to escape some characters for for json strings
+          if (*li == '\n') {
+            printf("\\n");
+            continue;
+          } else if (*li == '\b') {
+            printf("\\b");
+            continue;
+          } else if (*li == '\f') {
+            printf("\\f");
+            continue;
+          } else if (*li == '\r') {
+            printf("\\r");
+            continue;
+          } else if (*li == '\t') {
+            printf("\\t");
+            continue;
+          }
+          // escaping backslash and quotes
+          if (*li == '\\' || *li == '"')
+            printf("\\");
+          printf("%c", *li);
         }
-        // escaping backslash and quotes
-        if (*li == '\\' || *li == '"')
-          printf("\\");
-        printf("%c", *li);
+        printf("\",\n");
+      } else {
+        printf("%s\"cmdline\": null,\n", indent_level_eight);
       }
-      printf("\",\n");
 
       printf("%s\"kind\": ", indent_level_eight);
       if (proc->type != gpu_process_unknown) {
