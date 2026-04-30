@@ -6,7 +6,7 @@
 
 ARG IMAGE=nvidia/opengl:1.2-glvnd-runtime-ubuntu22.04
 
-FROM ${IMAGE} as builder
+FROM ${IMAGE} AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive
 
