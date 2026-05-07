@@ -39,6 +39,6 @@
         <binary>nvtop</binary>
     </provides>
     <releases>
-    <release version="@nvtop_VERSION_MAJOR@.@nvtop_VERSION_MINOR@.@nvtop_VERSION_PATCH@" date="@TODAY_ISO_8601@"></release>
+        <release version="@nvtop_VERSION_MAJOR@.@nvtop_VERSION_MINOR@.@nvtop_VERSION_PATCH@" date="@TODAY_ISO_8601@"></release>
     </releases>
 </component>
