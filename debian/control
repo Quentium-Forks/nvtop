@@ -4,12 +4,12 @@ Priority: optional
 Maintainer: Quentin Lienhardt <pro@quentium.fr>
 Build-Depends:
  cmake,
- debhelper (>= 13),
+ debhelper (>= 12),
  libncurses-dev,
  libdrm-dev,
  libsystemd-dev,
  libudev-dev,
-Standards-Version: 4.7.3
+Standards-Version: 4.7.4
 Rules-Requires-Root: no
 Vcs-Browser: https://github.com/Quentium-Forks/nvtop
 Vcs-Git: https://github.com/Quentium-Forks/nvtop.git
