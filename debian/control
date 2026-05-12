@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Quentin Lienhardt <pro@quentium.fr>
 Build-Depends:
  cmake,
- debhelper (>= 12),
+ debhelper (>= 13),
  libncurses-dev,
  libdrm-dev,
  libsystemd-dev,
