@@ -92,7 +92,7 @@ jobs:
           cat ${{ github.workspace }}/debian/changelog
 
       - name: Publish PPA package
-        uses: yuezk/publish-ppa-package@main
+        uses: Quentium-Forks/publish-ppa-package@main
         if: matrix.codename == 'jammy'
         with:
           tarball: ${{ github.workspace }}/release/nvtop-*.tar.gz
@@ -102,7 +102,7 @@ jobs:
           deb_fullname: "Quentin Lienhardt"
           gpg_private_key: ${{ secrets.PPA_GPG_PRIVATE_KEY }}
           gpg_passphrase: ${{ secrets.PPA_GPG_PASSPHRASE }}
-          series: "noble jammy"
+          series: "jammy noble resolute"
           new_version_template: "{VERSION}-{REVISION}+{SERIES}"
           keep_changelog: true
 
@@ -189,7 +189,7 @@ jobs:
           cat ${{ github.workspace }}/debian/changelog
 
       - name: Publish PPA package
-        uses: yuezk/publish-ppa-package@main
+        uses: Quentium-Forks/publish-ppa-package@main
         if: github.event.inputs.publish == 'true' && !contains(matrix.codename, 'arm')
         with:
           tarball: ${{ github.workspace }}/release/nvtop-nightly-*.tar.gz
@@ -199,7 +199,7 @@ jobs:
           deb_fullname: "Quentin Lienhardt"
           gpg_private_key: ${{ secrets.PPA_GPG_PRIVATE_KEY }}
           gpg_passphrase: ${{ secrets.PPA_GPG_PASSPHRASE }}
-          series: "noble jammy"
+          series: "jammy noble resolute"
           revision: ${{ env.revision }}
           new_version_template: "{VERSION}-{REVISION}+{SERIES}"
           keep_changelog: true
@@ -284,7 +284,7 @@ jobs:
           cat /__w/nvtop/nvtop/debian/changelog
 
       - name: Publish PPA package
-        uses: yuezk/publish-ppa-package@main
+        uses: Quentium-Forks/publish-ppa-package@main
         if: github.event.inputs.publish == 'true' && !contains(matrix.codename, 'arm')
         with:
           tarball: /__w/nvtop/nvtop/release/nvtop-nightly-*.tar.gz
