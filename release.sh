@@ -24,7 +24,7 @@ if [ "$1" == "nightly" ]; then
     if [ "$LAST_TAG" = "HEAD" ]; then
         COMMITS=0
     else
-        TAG_TS=$(git show -s --format=%ct "$LAST_TAG")
+        TAG_TS=$(git log -1 --format=%ct "$LAST_TAG")
         COMMITS=$(git rev-list --count --since=$((TAG_TS + 1)) HEAD 2> /dev/null || echo 0)
     fi
     echo "Build number: $COMMITS"
