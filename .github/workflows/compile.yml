@@ -21,11 +21,10 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Update apt cache
-        run: sudo apt-get update
-
       - name: Install dependencies
-        run: sudo apt-get install -y libncurses-dev libdrm-dev libsystemd-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libncurses5-dev libncursesw5-dev libdrm-dev libsystemd-dev
 
       - name: Configure CMake
         run: cmake -S . -B $BUILD_DIR
