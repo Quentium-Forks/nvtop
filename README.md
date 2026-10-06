@@ -41,7 +41,7 @@ Table of Contents
 - [Build](#build)
 - [Distribution Specific Installation Process](#distribution-specific-installation-process)
   - [Ubuntu / Debian](#ubuntu--debian)
-    - [Ubuntu Impish (21.10) / Debian buster (stable) and more recent (stable)](#ubuntu-impish-2110-debian-buster-stable-and-more-recent)
+    - [Ubuntu Focal (20.04), Debian buster (stable) and more recent](#ubuntu-focal-2004-debian-buster-stable-and-more-recent)
   - [Fedora / Red Hat / CentOS](#fedora--red-hat--centos)
   - [OpenSUSE](#opensuse)
   - [Arch Linux](#arch-linux)
@@ -270,7 +270,7 @@ A standalone application is available as [AppImage](#appimage).
   sudo dnf install nvtop
   ```
 
-#### Red Hat Enterprise Linux 8 and 9
+#### Red Hat Enterprise Linux 8, 9 and 10
 
 - ```bash
   sudo dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(rpm -E %{rhel}).noarch.rpm
@@ -348,9 +348,9 @@ An AppImage is a standalone application. Just download the AppImage, make it exe
   # Go to the download location ** The path may differ on your system **
   cd $HOME/Downloads
   # Make the AppImage executable
-  chmod u+x nvtop-x86_64.AppImage
+  chmod u+x nvtop-*-x86_64.AppImage
   # Enjoy nvtop
-  ./nvtop-x86_64.AppImage
+  ./nvtop-*-x86_64.AppImage
   ```
 
 If you are curious how that works, please visit the [AppImage website](https://appimage.org/).
