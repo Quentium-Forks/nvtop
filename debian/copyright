@@ -1,3 +1,12 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: nvtop
+Upstream-Contact: Quentin Lienhardt <pro@quentium.fr>
+Source: https://github.com/Syllo/nvtop
+
+Files: *
+Copyright: 2017 Maxime Schmitt <maxime.schmitt91@gmail.com>
+License: GPL-3+
+
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
