@@ -3,9 +3,13 @@ Upstream-Name: nvtop
 Upstream-Contact: Quentin Lienhardt <pro@quentium.fr>
 Source: https://github.com/Syllo/nvtop
 
+Files: debian/*
+Copyright: 2023 Quentin Lienhardt <pro@quentium.fr>
+License: GPL-3.0-or-later
+
 Files: *
 Copyright: 2017 Maxime Schmitt <maxime.schmitt91@gmail.com>
-License: GPL-3+
+License: GPL-3.0-or-later
 
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007

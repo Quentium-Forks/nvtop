@@ -3,7 +3,7 @@ Version:        3.3.2
 Release:        1%{?dist}
 Summary:        GPU & Accelerator process monitoring for AMD, Apple, Huawei, Intel, NVIDIA and Qualcomm
 
-License:        GPLv3
+License:        GPL-3.0-or-later
 URL:            https://github.com/Quentium-Forks/nvtop
 Source0:        %{name}-%{version}.tar.gz
 
