@@ -9,4 +9,7 @@ rpm/*RPMS/
 rpm/SOURCES/
 rpm/SPECS/*-nightly.spec
 
-*.AppImage
+# AppImage build artifacts
+/AppDir/
+/appimagetool
+/*.AppImage
