@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION=3.3.2
+VERSION=3.4.0
 DIR=nvtop-$VERSION
 ARCH=$(uname -m)
 ARCH_DPKG=$(dpkg --print-architecture)

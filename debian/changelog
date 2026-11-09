@@ -1,3 +1,60 @@
+nvtop (3.4.0-1) stable; urgency=medium
+
+  * Radeon GPUs - @gusteivos
+  * Tenstorrent accelerators - @OctopusET
+  * Iluvatar CoreX GPUs (ixML) - @lxzlxzliuxuzhao
+  * Qualcomm NPUs - @Srinivas-Kandagatla
+  * HVX/HMX utilization plots
+  * Ascend NPUs - @KaranocaVe - @yulink1981
+  * DCMI telemetry backend
+  * DDR memory support and 310P3 device enumeration
+  * MSM: more GPU IDs, current clock and temperature reporting - @robclark - @fromdisposition
+
+  * NVLink support - @danbedford
+  * ECC support for professional GPUs - @LH-and-FPGA
+  * Extra clock domains not reported by NVML (XBAR, SYS, NVD) - @Panchovix
+  * Real memory usage on unified-memory platforms - @sudoingX - @johnnynunez
+  * PCIe RX/TX load in the utilization charts - @Basavaraja-MS
+  * Dynamic memory units with -u/--dynamic-memory-units - @unstable-code
+  * Configurable plot line colors - @graysky2
+  * Number keys to select a signal after F9 - @abpaudel
+  * GPU architecture in JSON output - @Mahsuba
+
+  * Correct MIG mode handling for process utilization - @Henry-ZHR
+  * UMA memory fallback and unified-memory accounting - @redyuan43 - @sudoingX - @johnnynunez
+  * Do not report a fake PCIe link on unified-memory SoC GPUs - @Code4me2
+  * Show 0% instead of N/A when there are no new utilization samples - @wuzhonglijz
+  * Fix extra-clock flicker and use-after-free on re-monitored GPUs - @intel00000
+  * Fix startup segfault and NVIDIA detection under WSL2 - @zzccppp
+  * Count GTT in per-process memory on integrated GPUs - @rborkow
+  * Fall back to hwmon junction temperature on SMU13.0.6 - @jason34105533
+  * Fix divide-by-zero when the power limit is missing - @JoseOliveira-beep
+  * Fix ~20 MB/hour heap growth from per-refresh udev devices - @bqv
+  * Read the xe GT frequency from sysfs instead of a perf event - @stolk
+  * Fixes for Intel Xe cards and memory frequency reporting - @Steve-Tech
+  * Apply the graphical default per process, not per fd - @stolk
+  * Cap the engine busy percentage instead of dropping samples, avoiding a division by zero - @ViderStar
+  * Make --no-processes work with --snapshot and --loop - @yinghao-w
+  * Fix null cmdline in snapshot output - @gitfool
+  * Fix window cleanup leaks - @danbedford
+  * Respect the hide-processes option from the config file - @yinghao-w
+  * Increase the elapsed-time buffer on the timeline - @aadamowski
+  * Clamp GPU and memory clock percentages to 100 - @bqv
+  * Fix the shader core count field - @Panchovix
+  * Guard clock-rate plots against a zero maximum, drop stale processes of unmonitored GPUs
+  * MSM temperature and current clock reporting - @fromdisposition
+  * Various Ascend, Qualcomm and V3D fixes
+
+  * Dockerfile fix for Docker builds on Windows 11 - @piro4you
+  * Documentation for invalid TERM/ncurses errors - @raravind007
+  * Snap: terminfo packages for more terminals - @simonjgreen
+  * Snap: migrate to the core26 base - @Syllo
+  * AppImage: rebuild on AlmaLinux 8 without bundling glibc, add aarch64, and automate release builds - @Syllo
+  * Requires glibc 2.28+ (Ubuntu 20.04+, Debian 10+, RHEL 8+)
+  * RHEL 7 is no longer supported (EOL)
+
+ -- Quentin Lienhardt <pro@quentium.fr>  Mon, 09 Nov 2026 12:00:00 +0100
+
 nvtop (3.3.2-1) stable; urgency=medium
 
   * Snapshot mode (-s) outputs valid JSON - @Steve-Tech
