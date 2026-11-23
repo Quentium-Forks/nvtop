@@ -33,7 +33,7 @@ DESTDIR=%{buildroot} cmake --install build
 
 %files
 %license LICENSE
-%doc README.markdown
+%doc README.md
 %{_bindir}/%{name}
 %{_datadir}/applications/%{name}.desktop
 %{_datadir}/metainfo/io.github.syllo.%{name}.metainfo.xml
