@@ -63,6 +63,9 @@ enum gpuinfo_static_info_valid {
   gpuinfo_n_exec_engines_valid,
   gpuinfo_engine_count_valid,
   gpuinfo_memory_type_valid,
+  gpuinfo_apple_slot_valid,
+  gpuinfo_mpx_die_index_valid,
+  gpuinfo_c2c_link_count_valid,
   gpuinfo_static_info_count,
 };
 
@@ -73,16 +76,30 @@ struct gpuinfo_static_info {
   char device_architecture[MAX_DEVICE_NAME];
   unsigned max_pcie_gen;
   unsigned max_pcie_link_width;
-  unsigned temperature_shutdown_threshold;
-  unsigned temperature_slowdown_threshold;
+  unsigned temperature_shutdown_threshold; // Shutdown threshold in degrees Celsius
+  unsigned temperature_slowdown_threshold; // Slowdown threshold in degrees Celsius
   unsigned n_shared_cores;
   unsigned l2cache_size;
   unsigned n_exec_engines;
   unsigned engine_count;
+  bool c2c_attachment;     // Attached over NVLink-C2C instead of PCIe
+  unsigned c2c_link_count; // Number of NVLink-C2C links, 0 when unknown or none
   bool integrated_graphics;
   bool encode_decode_shared;
   bool memory_shared_with_host; // True if device memory is shared with the host (e.g. UMA)
   char memory_type[8];
+  // Apple chassis metadata, populated by the macOS backend from the GPU's
+  // IOPCIDevice. Other backends leave these invalid; do not read them unless
+  // the matching *_valid bit is set. The PCI address itself goes through the
+  // usual gpu_info.pdev field.
+  // Chassis slot label published by Apple as AAPL,slot-name ("Slot-1" on a
+  // MacPro7,1, "PCI Slot 2" on other Intel Macs). Multi-die cards share the
+  // slot label; mpx_die_index disambiguates them.
+  char apple_slot[32];
+  // 0-indexed die position inside the slot, parsed from the GD<y> ACPI device
+  // segment of the AMD driver path. 0 for single-die cards; 0 or 1 for a
+  // W6800X/W6900X Duo.
+  unsigned mpx_die_index;
   unsigned char valid[(gpuinfo_static_info_count + CHAR_BIT - 1) / CHAR_BIT];
 };
 
@@ -103,6 +120,8 @@ enum gpuinfo_dynamic_info_valid {
   gpuinfo_total_memory_valid,
   gpuinfo_free_memory_valid,
   gpuinfo_used_memory_valid,
+  gpuinfo_system_total_memory_valid,
+  gpuinfo_system_free_memory_valid,
   gpuinfo_pcie_link_gen_valid,
   gpuinfo_pcie_link_width_valid,
   gpuinfo_pcie_rx_valid,
@@ -146,6 +165,8 @@ struct gpuinfo_dynamic_info {
   unsigned long long total_memory;    // Total memory (bytes)
   unsigned long long free_memory;     // Unallocated memory (bytes)
   unsigned long long used_memory;     // Allocated memory (bytes)
+  unsigned long long system_total_memory; // Total system memory (bytes)
+  unsigned long long system_free_memory;  // System memory available for allocation (bytes)
   unsigned long long ecc_corrected;   // Total correctable ECC errors
   unsigned long long ecc_uncorrected; // Total uncorrected ECC errors
   unsigned int pcie_link_gen;         // PCIe link generation used
@@ -161,6 +182,18 @@ struct gpuinfo_dynamic_info {
   unsigned int extra_clock_count;     // Number of populated entries in extra_clocks
   struct gpuinfo_extra_clock extra_clocks[MAX_EXTRA_CLOCK_DOMAINS];
   unsigned char valid[(gpuinfo_dynamic_info_count + CHAR_BIT - 1) / CHAR_BIT];
+};
+
+struct gpuinfo_memory_display {
+  unsigned long long total_memory; // bytes
+  unsigned long long used_memory;  // bytes
+  unsigned long long free_memory;  // bytes
+  unsigned int mem_util_rate;      // percent
+  bool total_memory_valid;
+  bool used_memory_valid;
+  bool free_memory_valid;
+  bool mem_util_rate_valid;
+  bool system_memory; // True for the system RAM fallback
 };
 
 enum gpu_process_type {
@@ -186,6 +219,7 @@ enum gpuinfo_process_info_valid {
   gpuinfo_process_decode_usage_valid,
   gpuinfo_process_gpu_memory_usage_valid,
   gpuinfo_process_gpu_memory_percentage_valid,
+  gpuinfo_process_gpu_memory_shared_valid,
   gpuinfo_process_cpu_usage_valid,
   gpuinfo_process_cpu_memory_virt_valid,
   gpuinfo_process_cpu_memory_res_valid,
@@ -211,6 +245,11 @@ struct gpu_process {
   unsigned long long gpu_memory_usage; // Memory used by the process
   unsigned gpu_memory_percentage;      // Percentage of the total device memory
                                        // consumed by the process
+  unsigned long long gpu_memory_shared; // Shared part of gpu_memory_usage, summed
+                                        // over the DRM clients of the process
+  // Largest shared part of one DRM client of this process. Used to count the
+  // shared buffers once when deriving device-wide memory.
+  unsigned long long gpu_memory_shared_max;
   unsigned cpu_usage;
   unsigned long cpu_memory_virt;
   unsigned long cpu_memory_res;
@@ -224,6 +263,8 @@ struct gpu_info;
 enum gpu_processing_unit {
   gpu_processing_unit_gpu = 0,
   gpu_processing_unit_npu,
+  gpu_processing_unit_ppu,
+  gpu_processing_unit_hpu,
   gpu_processing_unit_count,
 };
 
@@ -253,6 +294,10 @@ struct gpu_info {
   struct gpuinfo_static_info static_info;
   struct gpuinfo_dynamic_info dynamic_info;
   unsigned processes_count;
+  // A fresh process query succeeded, including an empty result. This does not
+  // imply that each process exposes memory usage; check its validity flag.
+  // Backends that cannot establish query success leave this false.
+  bool processes_query_succeeded;
   struct gpu_process *processes;
   unsigned processes_array_size;
   char pdev[PDEV_LEN];
@@ -260,7 +305,7 @@ struct gpu_info {
 
 // Short 3-character label for a processing unit (e.g. "GPU", "NPU")
 static inline const char *processing_unit_name(enum gpu_processing_unit unit) {
-  static const char *const names[gpu_processing_unit_count] = {"GPU", "NPU"};
+  static const char *const names[gpu_processing_unit_count] = {"GPU", "NPU", "PPU", "HPU"};
   return (unsigned)unit < gpu_processing_unit_count ? names[unit] : names[gpu_processing_unit_gpu];
 }
 
@@ -271,6 +316,17 @@ void register_gpu_vendor(struct gpu_vendor *vendor);
 bool extract_drm_fdinfo_key_value(char *buf, char **key, char **val);
 
 void gpuinfo_refresh_utilisation_rate(struct gpu_info *gpu_info);
+
+// Fill only system_total_memory and system_free_memory from /proc/meminfo.
+// GPU counters remain independent of these system-wide measurements.
+void gpuinfo_refresh_system_memory(struct gpuinfo_dynamic_info *dynamic_info);
+// Derive shared GPU memory from the current process list and system availability.
+void gpuinfo_fix_shared_memory_from_process_info(struct gpu_info *device);
+bool gpuinfo_get_system_used_memory(const struct gpuinfo_dynamic_info *dynamic_info, unsigned long long *used);
+// Return memory values for display. A device sharing its memory with the host
+// shows the system RAM when its GPU accounting is unavailable, or when
+// prefer_system_memory is set. Does not modify the device.
+struct gpuinfo_memory_display gpuinfo_get_memory_display(const struct gpu_info *device, bool prefer_system_memory);
 
 // Appends a vendor specific clock domain to the dynamic info, ignoring the call
 // once MAX_EXTRA_CLOCK_DOMAINS of them have been reported. A secondary domain is
